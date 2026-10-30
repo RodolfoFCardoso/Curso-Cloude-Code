@@ -43,6 +43,23 @@ Contas e listas ("Quero assistir" / "Já assisti") usam o [Supabase](https://sup
 
 3. No painel, abra o **SQL Editor** e rode o conteúdo de `supabase/schema.sql` (cria a tabela
    `movie_status` com RLS ativada).
+4. Em **Authentication > URL Configuration**, defina a **Site URL** (em dev, `http://localhost:3000`)
+   e inclua a mesma origem em **Redirect URLs**.
+5. Em **Authentication > Email Templates**, troque o link dos dois modelos:
+   - **Confirm signup**:
+
+     ```
+     {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next=/
+     ```
+
+   - **Reset password**:
+
+     ```
+     {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/conta/nova-senha
+     ```
+
+> **Limite de e-mails:** o SMTP padrão do Supabase envia poucos e-mails por hora. Quem passa do
+> limite vê "Muitas tentativas. Aguarde alguns minutos." Para uso real, configure um SMTP próprio.
 
 ## Comandos
 

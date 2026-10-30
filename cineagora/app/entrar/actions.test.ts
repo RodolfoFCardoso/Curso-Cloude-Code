@@ -4,11 +4,14 @@ const h = vi.hoisted(() => ({
   signInWithPassword: vi.fn(),
   signUp: vi.fn(),
   signOut: vi.fn(),
+  resetPasswordForEmail: vi.fn(),
 }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
-    auth: { signInWithPassword: h.signInWithPassword, signUp: h.signUp, signOut: h.signOut },
+    auth: { signInWithPassword: h.signInWithPassword, signUp: h.signUp, signOut: h.signOut,
+      resetPasswordForEmail: h.resetPasswordForEmail,
+    },
   }),
 }));
 vi.mock('next/navigation', () => ({
@@ -17,7 +20,7 @@ vi.mock('next/navigation', () => ({
   },
 }));
 
-import { signIn, signOut, signUp } from './actions';
+import { requestPasswordReset, signIn, signOut, signUp } from './actions';
 
 function form(values: Record<string, string>) {
   const f = new FormData();
@@ -111,5 +114,32 @@ describe('signOut', () => {
     h.signOut.mockResolvedValue({ error: null });
     await expect(signOut()).rejects.toThrow('REDIRECT:/');
     expect(h.signOut).toHaveBeenCalled();
+  });
+});
+
+describe('requestPasswordReset', () => {
+  const sent = {
+    status: 'sent',
+    message: 'Se houver uma conta com esse e-mail, enviamos um link.',
+  };
+  it('responde neutro mesmo se o e-mail não existe', async () => {
+    h.resetPasswordForEmail.mockResolvedValue({ error: { code: 'user_not_found' } });
+    await expect(requestPasswordReset(idle, form({ email: 'x@y.z' }))).resolves.toEqual(sent);
+    h.resetPasswordForEmail.mockResolvedValue({ error: null });
+    await expect(requestPasswordReset(idle, form({ email: 'x@y.z' }))).resolves.toEqual(sent);
+  });
+  it('vazio pede e-mail', async () => {
+    await expect(requestPasswordReset(idle, form({ email: '  ' }))).resolves.toEqual({
+      status: 'error',
+      message: 'Informe seu e-mail.',
+    });
+    expect(h.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+  it('rate limit vira erro', async () => {
+    h.resetPasswordForEmail.mockResolvedValue({ error: { code: 'over_email_send_rate_limit' } });
+    await expect(requestPasswordReset(idle, form({ email: 'x@y.z' }))).resolves.toEqual({
+      status: 'error',
+      message: 'Muitas tentativas. Aguarde alguns minutos.',
+    });
   });
 });

@@ -55,3 +55,21 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   redirect('/');
 }
+
+const RATE_LIMIT_CODES = new Set(['over_email_send_rate_limit', 'over_request_rate_limit']);
+
+export async function requestPasswordReset(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const email = field(formData, 'email').trim();
+  if (!email) return { status: 'error', message: 'Informe seu e-mail.' };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  // Resposta neutra para não revelar quais e-mails têm conta; só o limite de envio aparece.
+  if (error?.code && RATE_LIMIT_CODES.has(error.code)) {
+    return { status: 'error', message: authErrorMessage(error) };
+  }
+  return { status: 'sent', message: 'Se houver uma conta com esse e-mail, enviamos um link.' };
+}

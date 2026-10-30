@@ -1,5 +1,7 @@
+import { Suspense } from 'react';
 import { FilterableRow } from '@/components/FilterableRow';
 import { HomeHero } from '@/components/HomeHero';
+import { Notice } from '@/components/Notice';
 import { RatingFilter } from '@/components/RatingFilter';
 import { FilteredEmptyNotice, RailStatusProvider } from '@/components/RailStatus';
 import { loadFeatured } from '@/lib/featured';
@@ -9,6 +11,9 @@ export default async function Home() {
   const [rails, featured] = await Promise.all([loadHomeRails(), loadFeatured()]);
   return (
     <>
+      <Suspense fallback={null}>
+        <Notice />
+      </Suspense>
       <h1 className="sr-only">CineAgora: o que assistir nos seus streamings</h1>
       {featured.length > 0 ? <HomeHero featured={featured} /> : <div className="h-20" />}
       <div className="mt-14">

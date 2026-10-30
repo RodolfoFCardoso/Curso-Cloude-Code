@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 const h = vi.hoisted(() => ({
-  signIn: vi.fn(async (..._args: unknown[]): Promise<unknown> => ({ status: 'idle' })),
-  signUp: vi.fn(async (..._args: unknown[]): Promise<unknown> => ({ status: 'idle' })),
+  signIn: vi.fn<(...args: unknown[]) => Promise<unknown>>(async () => ({ status: 'idle' })),
+  signUp: vi.fn<(...args: unknown[]) => Promise<unknown>>(async () => ({ status: 'idle' })),
 }));
 vi.mock('@/app/entrar/actions', () => ({ signIn: h.signIn, signUp: h.signUp }));
 

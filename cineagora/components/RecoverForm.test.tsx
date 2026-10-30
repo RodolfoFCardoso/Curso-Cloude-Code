@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 const h = vi.hoisted(() => ({
-  requestPasswordReset: vi.fn(async (..._args: unknown[]): Promise<unknown> => ({ status: 'idle' })),
+  requestPasswordReset: vi.fn<(...args: unknown[]) => Promise<unknown>>(async () => ({ status: 'idle' })),
 }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/app/entrar/actions', () => ({ requestPasswordReset: h.requestPasswordReset }));

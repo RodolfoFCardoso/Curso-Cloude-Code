@@ -4,10 +4,22 @@ import { formatRating } from '@/lib/format';
 import type { Movie, WatchProvider } from '@/lib/tmdb/types';
 import { ProviderBadge } from './ProviderBadge';
 
-export function MovieCard({ movie, badges = [] }: { movie: Movie; badges?: WatchProvider[] }) {
+export function MovieCard({
+  movie,
+  badges = [],
+  fluid = false,
+}: {
+  movie: Movie;
+  badges?: WatchProvider[];
+  /** Ocupa a largura do container (grade) em vez da largura fixa do trilho. */
+  fluid?: boolean;
+}) {
   const rating = formatRating(movie.rating);
   return (
-    <Link href={`/filme/${movie.id}`} className="group block w-36 shrink-0 snap-start sm:w-40">
+    <Link
+      href={`/filme/${movie.id}`}
+      className={`group block ${fluid ? 'w-full' : 'w-36 shrink-0 snap-start sm:w-40'}`}
+    >
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-zinc-800 ring-1 ring-white/5 transition group-hover:ring-amber-400/70 group-focus-visible:ring-amber-400">
         {movie.posterUrl ? (
           <Image

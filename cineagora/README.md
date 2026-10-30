@@ -29,6 +29,21 @@ npm run dev
 
 Abra <http://localhost:3000>.
 
+## Contas (Supabase)
+
+Contas e listas ("Quero assistir" / "Já assisti") usam o [Supabase](https://supabase.com/).
+
+1. Crie um projeto no Supabase e, em **Project Settings > API**, copie a URL e a chave publicável.
+2. Adicione ao `cineagora/.env.local`:
+
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+   ```
+
+3. No painel, abra o **SQL Editor** e rode o conteúdo de `supabase/schema.sql` (cria a tabela
+   `movie_status` com RLS ativada).
+
 ## Comandos
 
 | Comando          | O que faz                   |

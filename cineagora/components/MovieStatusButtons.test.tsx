@@ -122,6 +122,19 @@ describe('MovieStatusButtons', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Não foi possível salvar, tente de novo.');
   });
 
+  it('erro de carga: botões desabilitados e Tentar de novo chama reload', async () => {
+    const s = controlled(true, 'load');
+    await setup({ store: s.store });
+    expect(want()).toBeDisabled();
+    expect(watched()).toBeDisabled();
+    expect(screen.getByRole('status')).toHaveTextContent('Não foi possível carregar suas listas.');
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+    expect(s.reload).toHaveBeenCalledTimes(1);
+    await act(async () => s.fail(null));
+    expect(want()).toBeEnabled();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
   it('Review Focus 3: sessão que expira com a página aberta leva para entrar', async () => {
     const s = controlled(true, null);
     await setup({ store: s.store });

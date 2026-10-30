@@ -73,6 +73,15 @@ describe('MovieListPanel', () => {
     );
   });
 
+  it('sessão expirada (unauthenticated) mostra o convite para entrar', async () => {
+    await setup('want', stub({ ready: true, error: 'unauthenticated' }));
+    expect(screen.getByText('Entre para montar suas listas')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute(
+      'href',
+      '/entrar?voltar=%2F%3Faba%3Dquero-assistir',
+    );
+  });
+
   it('carregando mostra skeletons', async () => {
     await setup('want', stub({ ready: false }));
     expect(screen.getAllByTestId('list-skeleton')).toHaveLength(12);

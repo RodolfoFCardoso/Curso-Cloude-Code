@@ -18,7 +18,8 @@ export function MovieListPanel({ status }: { status: MovieStatus }) {
   const { user } = useAuth();
   const { ready, error, list, reload } = useMovieList();
 
-  if (!user) {
+  // Sessão expirada (ou Sair em outra aba): mesmo convite do deslogado.
+  if (!user || error === 'unauthenticated') {
     const voltar = encodeURIComponent(`/?aba=${STATUS_TAB[status]}`);
     return (
       <EmptyState

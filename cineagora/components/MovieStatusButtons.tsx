@@ -52,6 +52,7 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
   if (!available) return null;
 
   const current = statusOf(movie.id);
+  const loadFailed = !!user && error === 'load';
 
   function onClick(status: MovieStatus) {
     if (!user) {
@@ -71,7 +72,7 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
               key={o.status}
               type="button"
               aria-pressed={active}
-              disabled={!!user && !ready}
+              disabled={(!!user && !ready) || loadFailed}
               onClick={() => onClick(o.status)}
               className={`inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold ring-1 backdrop-blur-md transition-colors disabled:opacity-60 ${
                 active
@@ -87,6 +88,18 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
           );
         })}
       </div>
+      {loadFailed && (
+        <p role="status" className="flex flex-wrap items-center gap-2 text-sm text-tela/80">
+          Não foi possível carregar suas listas.
+          <button
+            type="button"
+            onClick={() => void reload()}
+            className="font-semibold text-tela underline underline-offset-2 hover:text-tela/80"
+          >
+            Tentar de novo
+          </button>
+        </p>
+      )}
       {error === 'save' && (
         <p role="status" className="text-sm text-tela/80">
           Não foi possível salvar, tente de novo.

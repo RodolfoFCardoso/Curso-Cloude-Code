@@ -4,6 +4,7 @@ import { HeaderShell } from './HeaderShell';
 import { Logo } from './Logo';
 import { ProviderFilter } from './ProviderFilter';
 import { SearchBar } from './SearchBar';
+import { UserMenu } from './UserMenu';
 
 export function Header({ providers }: { providers: WatchProvider[] | null }) {
   return (
@@ -26,6 +27,7 @@ export function Header({ providers }: { providers: WatchProvider[] | null }) {
           </svg>
         </Link>
         <ProviderFilter providers={providers} />
+        <UserMenu />
       </div>
     </HeaderShell>
   );

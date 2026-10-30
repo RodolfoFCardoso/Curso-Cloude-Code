@@ -72,11 +72,14 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub":"<uuid de B>"}';
 select count(*) from public.movie_status;                       -- esperado: igual ao número de linhas marcadas por B; nunca inclui linhas de A
 update public.movie_status set status = 'watched' where user_id = '<uuid de A>';  -- esperado: 0 linhas
+delete from public.movie_status where user_id = '<uuid de A>';                     -- esperado: 0 linhas
+insert into public.movie_status (user_id, movie_id, status, title) values ('<uuid de A>', 1, 'want', 'x');  -- esperado: erro de RLS
 rollback;
 ```
 
 Os UUIDs ficam em **Authentication > Users**. O `rollback` desfaz qualquer alteração feita pelo
-teste.
+teste. O `insert` fica por último porque, no Postgres, um erro aborta a transação e os comandos
+seguintes falhariam.
 
 ### Roteiro manual
 
@@ -95,7 +98,7 @@ Checklist para validar o fluxo completo no navegador (`npm run dev`):
 - [ ] Resultado esperado: após o primeiro login, "Clube da Luta" aparece em "Quero assistir" e a
       chave `cineagora:favorites:v1` some do Local Storage.
 - [ ] Marcar 2 filmes, um em cada status ("Quero assistir" e "Já assisti").
-- [ ] Conferir as contagens nas abas da página de listas.
+- [ ] Conferir as contagens nas abas da home.
 - [ ] Logout em uma aba reflete na outra aberta.
 - [ ] Trocar a senha pela página da conta.
 - [ ] Recuperar a senha pelo e-mail e definir uma nova.

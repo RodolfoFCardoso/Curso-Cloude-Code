@@ -1,0 +1,61 @@
+{
+  "results": [
+    {
+      "provider_id": 8,
+      "provider_name": "Netflix",
+      "logo_path": "/rK1KljqmbvO9HQa1PBFLILWah72.png",
+      "display_priority": 0,
+      "display_priorities": {
+        "BR": 0,
+        "US": 3
+      }
+    },
+    {
+      "provider_id": 119,
+      "provider_name": "Amazon Prime Video",
+      "logo_path": "/gMZdpavHmxFNnLpMHwVxfqeux2g.png",
+      "display_priority": 1,
+      "display_priorities": {
+        "BR": 1
+      }
+    },
+    {
+      "provider_id": 350,
+      "provider_name": "Apple TV",
+      "logo_path": "/9icYBfYFcwgCbky5VdGUIKJ4C5i.png",
+      "display_priority": 2,
+      "display_priorities": {
+        "BR": 2,
+        "US": 5
+      }
+    },
+    {
+      "provider_id": 337,
+      "provider_name": "Disney Plus",
+      "logo_path": "/5eZ872CghnHFLB1j8grszbrx0dx.png",
+      "display_priority": 3,
+      "display_priorities": {
+        "BR": 3,
+        "US": 6
+      }
+    },
+    {
+      "provider_id": 167,
+      "provider_name": "Claro video",
+      "logo_path": "/zTJg0WVErBkcJv4S9FkQRUyXjnq.png",
+      "display_priority": 8,
+      "display_priorities": {
+        "BR": 4
+      }
+    },
+    {
+      "provider_id": 47,
+      "provider_name": "Looke",
+      "logo_path": "/jsAseYgBGuHRkl0sJs9AAQHHU8P.png",
+      "display_priority": 5,
+      "display_priorities": {
+        "BR": 5
+      }
+    }
+  ]
+}

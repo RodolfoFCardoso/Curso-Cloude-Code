@@ -1,0 +1,183 @@
+{
+  "id": 550,
+  "title": "Clube da Luta",
+  "release_date": "1999-10-15",
+  "vote_average": 8.438,
+  "vote_count": 33167,
+  "poster_path": "/mCICnh7QBH0gzYaTQChBDDVIKdm.jpg",
+  "backdrop_path": "/c6OLXfKAk5BKeR6broC8pYiCquX.jpg",
+  "runtime": 139,
+  "overview": "Um homem deprimido que sofre de insônia conhece um estranho vendedor de sabonetes chamado Tyler Durden. Eles formam um clube clandestino com regras rígidas onde lutam com outros homens cansados de suas vidas mundanas. Mas sua parceria perfeita é comprometida quando Marla chama a atenção de Tyler.",
+  "genres": [
+    {
+      "id": 18,
+      "name": "Drama"
+    },
+    {
+      "id": 53,
+      "name": "Thriller"
+    }
+  ],
+  "videos": {
+    "results": [
+      {
+        "key": "V0Fqdb-smqo",
+        "site": "YouTube",
+        "type": "Featurette",
+        "iso_639_1": "en",
+        "official": false
+      },
+      {
+        "key": "dfeUzm6KF4g",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "en",
+        "official": true
+      },
+      {
+        "key": "tiWCNtGDGEY",
+        "site": "YouTube",
+        "type": "Featurette",
+        "iso_639_1": "en",
+        "official": true
+      },
+      {
+        "key": "6JnN1DmbqoU",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "en",
+        "official": false
+      },
+      {
+        "key": "BdJKm16Co6M",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "en",
+        "official": true
+      }
+    ]
+  },
+  "credits": {
+    "cast": [
+      {
+        "id": 819,
+        "name": "Edward Norton",
+        "character": "Narrator",
+        "profile_path": "/8nytsqL59SFJTVYVrN72k6qkGgJ.jpg",
+        "order": 0
+      },
+      {
+        "id": 287,
+        "name": "Brad Pitt",
+        "character": "Tyler Durden",
+        "profile_path": "/ajNaPmXVVMJFg9GWmu6MJzTaXdV.jpg",
+        "order": 1
+      },
+      {
+        "id": 1283,
+        "name": "Helena Bonham Carter",
+        "character": "Marla Singer",
+        "profile_path": "/hJMbNSPJ2PCahsP3rNEU39C8GWU.jpg",
+        "order": 2
+      },
+      {
+        "id": 7470,
+        "name": "Meat Loaf",
+        "character": "Robert Paulson",
+        "profile_path": "/1zkohpaG3my4qQAZGVgzgPuXwZ6.jpg",
+        "order": 3
+      },
+      {
+        "id": 7499,
+        "name": "Jared Leto",
+        "character": "Angel Face",
+        "profile_path": "/ca3x0OfIKbJppZh8S1Alx3GfUZO.jpg",
+        "order": 4
+      },
+      {
+        "id": 7471,
+        "name": "Zach Grenier",
+        "character": "Richard Chesler (Regional Manager)",
+        "profile_path": "/fSyQKZO39sUsqY283GXiScOg3Hi.jpg",
+        "order": 5
+      },
+      {
+        "id": 7497,
+        "name": "Holt McCallany",
+        "character": "The Mechanic",
+        "profile_path": "/b1FEXFQ8ZnvXhVrMqCv5mTJ8aW3.jpg",
+        "order": 6
+      },
+      {
+        "id": 7498,
+        "name": "Eion Bailey",
+        "character": "Ricky",
+        "profile_path": "/3DW13W47cKk4LQZwS4EvRaNBoVu.jpg",
+        "order": 7
+      },
+      {
+        "id": 7472,
+        "name": "Richmond Arquette",
+        "character": "Intern at Hospital",
+        "profile_path": "/7byGiVac0GjBSVD1h6ylZlVXZK6.jpg",
+        "order": 8
+      },
+      {
+        "id": 7219,
+        "name": "David Andrews",
+        "character": "Thomas at Remaining Men Together",
+        "profile_path": "/s5jEvhtGrYptw3Mmv7bejvcAKLv.jpg",
+        "order": 9
+      },
+      {
+        "id": 1129738,
+        "name": "George Maguire",
+        "character": "Group Leader at Remaining Men Together",
+        "profile_path": "/pyKzJNkpjCA96ItVq93x1Y2YfYx.jpg",
+        "order": 10
+      },
+      {
+        "id": 1317693,
+        "name": "Eugenie Bondurant",
+        "character": "Weeping Woman - Onward and Upward",
+        "profile_path": "/9ULAELEKNha7VCJhRWoer58NcJe.jpg",
+        "order": 11
+      }
+    ]
+  },
+  "similar": {
+    "page": 1,
+    "results": [
+      {
+        "id": 13,
+        "title": "Forrest Gump: O Contador de Histórias",
+        "release_date": "1994-06-23",
+        "vote_average": 8.462,
+        "vote_count": 30772,
+        "poster_path": "/d74WpIsH8379TIL4wUxDneRCYv2.jpg",
+        "backdrop_path": "/66Kn4XWhkuPkJxOJyPEx4U2CUfN.jpg",
+        "genre_ids": [35, 18, 10749]
+      },
+      {
+        "id": 14,
+        "title": "Beleza Americana",
+        "release_date": "1999-09-15",
+        "vote_average": 7.998,
+        "vote_count": 13496,
+        "poster_path": "/9PJKsH7Btz2xjYIvLLtJ7qcJlL3.jpg",
+        "backdrop_path": "/2ndw55F40IkALzWyjCCza3M6nqM.jpg",
+        "genre_ids": [18]
+      },
+      {
+        "id": 19,
+        "title": "Metrópolis",
+        "release_date": "1927-01-10",
+        "vote_average": 8.082,
+        "vote_count": 3247,
+        "poster_path": "/xBx21HvGJCb15PKWkyb7uc435Wx.jpg",
+        "backdrop_path": "/eeMoFKxjjiCi6iep2GEZtSAMYIr.jpg",
+        "genre_ids": [18, 878]
+      }
+    ]
+  }
+}

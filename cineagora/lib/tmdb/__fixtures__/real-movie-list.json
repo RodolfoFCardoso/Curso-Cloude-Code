@@ -1,0 +1,35 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "id": 155,
+      "title": "Batman: O Cavaleiro das Trevas",
+      "release_date": "2008-07-18",
+      "vote_average": 8.539,
+      "vote_count": 37126,
+      "poster_path": "/4lj1ikfsSmMZNyfdi8R8Tv5tsgb.jpg",
+      "backdrop_path": "/9FE5eD92WfVCiivM9Pq9GVSrlWk.jpg",
+      "genre_ids": [28, 53, 80]
+    },
+    {
+      "id": 791523,
+      "title": "O Bosque Selvagem",
+      "release_date": "2026-10-29",
+      "vote_average": 8.628,
+      "vote_count": 109,
+      "poster_path": "/mcuUYNWGJHPEaRumOlgSZCzMRPc.jpg",
+      "backdrop_path": "/sl5NJ1vtyhP9Vr88bB4blULsJYp.jpg",
+      "genre_ids": [16, 12, 14]
+    },
+    {
+      "id": 1058424,
+      "title": "Hope: O Primeiro Impacto",
+      "release_date": "2026-10-08",
+      "vote_average": 6.788,
+      "vote_count": 393,
+      "poster_path": "/yfWe8Vaac8b8f9dagmzBWOroUcg.jpg",
+      "backdrop_path": "/qqHFLg90IUSoTmSMpKOOW5RyqN3.jpg",
+      "genre_ids": [878, 9648, 28]
+    }
+  ]
+}

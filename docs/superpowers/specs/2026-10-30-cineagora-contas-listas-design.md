@@ -114,7 +114,7 @@ Removidos: `FavoritesStore`, `local-favorites.ts`, `runFavoritesStoreContract`,
 Dependências: `@supabase/supabase-js`, `@supabase/ssr`.
 
 Variáveis em `.env.local` (e documentadas em `.env.example`):
-`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 Arquivos:
 

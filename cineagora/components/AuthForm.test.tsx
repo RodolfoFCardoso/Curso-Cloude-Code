@@ -1,11 +1,12 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
-vi.mock('@/app/entrar/actions', () => ({
-  signIn: vi.fn(async () => ({ status: 'idle' })),
-  signUp: vi.fn(async () => ({ status: 'idle' })),
+const h = vi.hoisted(() => ({
+  signIn: vi.fn(async (..._args: unknown[]): Promise<unknown> => ({ status: 'idle' })),
+  signUp: vi.fn(async (..._args: unknown[]): Promise<unknown> => ({ status: 'idle' })),
 }));
+vi.mock('@/app/entrar/actions', () => ({ signIn: h.signIn, signUp: h.signUp }));
 
 import { AuthForm } from './AuthForm';
 
@@ -30,5 +31,21 @@ describe('AuthForm', () => {
   it('mostra aviso de link expirado', () => {
     render(<AuthForm voltar="/" erro="link-expirado" />);
     expect(screen.getByRole('alert')).toHaveTextContent('Link expirado, peça outro.');
+  });
+  it('mantém o e-mail digitado depois de um erro', async () => {
+    h.signIn.mockResolvedValueOnce({
+      status: 'error',
+      message: 'E-mail ou senha incorretos.',
+      email: 'a@b.c',
+    });
+    const { container } = render(<AuthForm voltar="/" />);
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'a@b.c' } });
+    fireEvent.change(screen.getByLabelText('Senha'), { target: { value: 'errada' } });
+    await act(async () => {
+      fireEvent.click(container.querySelector('button[type="submit"]')!);
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent('E-mail ou senha incorretos.');
+    expect(screen.getByLabelText('E-mail')).toHaveValue('a@b.c');
+    expect(screen.getByLabelText('Senha')).toHaveValue('');
   });
 });

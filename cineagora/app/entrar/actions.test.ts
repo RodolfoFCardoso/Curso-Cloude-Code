@@ -46,19 +46,22 @@ describe('signIn', () => {
   });
   it('credenciais erradas', async () => {
     h.signInWithPassword.mockResolvedValue({ error: { code: 'invalid_credentials' } });
-    await expect(signIn(idle, form({ email: 'a@b.c', password: 'x' }))).resolves.toEqual({
+    await expect(signIn(idle, form({ email: ' a@b.c ', password: 'x' }))).resolves.toEqual({
       status: 'error',
       message: 'E-mail ou senha incorretos.',
+      email: 'a@b.c',
     });
   });
   it('campos vazios', async () => {
     await expect(signIn(idle, form({ email: '', password: '123' }))).resolves.toEqual({
       status: 'error',
       message: 'Informe e-mail e senha.',
+      email: '',
     });
     await expect(signIn(idle, form({ email: 'a@b.c', password: '' }))).resolves.toEqual({
       status: 'error',
       message: 'Informe e-mail e senha.',
+      email: 'a@b.c',
     });
     expect(h.signInWithPassword).not.toHaveBeenCalled();
   });
@@ -70,6 +73,7 @@ describe('signUp', () => {
     await expect(signUp(idle, form({ ...ok, password: '12345' }))).resolves.toEqual({
       status: 'error',
       message: 'A senha precisa ter pelo menos 6 caracteres.',
+      email: 'a@b.c',
     });
     expect(h.signUp).not.toHaveBeenCalled();
   });
@@ -77,6 +81,7 @@ describe('signUp', () => {
     await expect(signUp(idle, form({ ...ok, email: '' }))).resolves.toEqual({
       status: 'error',
       message: 'Informe e-mail e senha.',
+      email: '',
     });
   });
   it('sem sessão pede confirmação', async () => {
@@ -91,6 +96,7 @@ describe('signUp', () => {
     await expect(signUp(idle, form(ok))).resolves.toEqual({
       status: 'error',
       message: 'Este e-mail já tem conta.',
+      email: 'a@b.c',
     });
   });
   it('com sessão redireciona', async () => {
@@ -105,6 +111,7 @@ describe('signUp', () => {
     await expect(signUp(idle, form(ok))).resolves.toEqual({
       status: 'error',
       message: 'Senha fraca. Use letras, números e símbolos.',
+      email: 'a@b.c',
     });
   });
 });
@@ -132,6 +139,7 @@ describe('requestPasswordReset', () => {
     await expect(requestPasswordReset(idle, form({ email: '  ' }))).resolves.toEqual({
       status: 'error',
       message: 'Informe seu e-mail.',
+      email: '',
     });
     expect(h.resetPasswordForEmail).not.toHaveBeenCalled();
   });
@@ -140,6 +148,7 @@ describe('requestPasswordReset', () => {
     await expect(requestPasswordReset(idle, form({ email: 'x@y.z' }))).resolves.toEqual({
       status: 'error',
       message: 'Muitas tentativas. Aguarde alguns minutos.',
+      email: 'x@y.z',
     });
   });
 });

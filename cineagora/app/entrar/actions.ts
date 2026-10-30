@@ -8,6 +8,10 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 const MIN_PASSWORD = 6;
 
+function fail(message: string, email: string): AuthFormState {
+  return { status: 'error', message, email };
+}
+
 function field(formData: FormData, name: string): string {
   const v = formData.get(name);
   return typeof v === 'string' ? v : '';
@@ -16,11 +20,11 @@ function field(formData: FormData, name: string): string {
 export async function signIn(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = field(formData, 'email').trim();
   const password = field(formData, 'password');
-  if (!email || !password) return { status: 'error', message: 'Informe e-mail e senha.' };
+  if (!email || !password) return fail('Informe e-mail e senha.', email);
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { status: 'error', message: authErrorMessage(error) };
+  if (error) return fail(authErrorMessage(error), email);
 
   // redirect() lança; fica fora de qualquer try/catch.
   redirect(safeRedirectPath(field(formData, 'voltar')));
@@ -29,18 +33,18 @@ export async function signIn(_prev: AuthFormState, formData: FormData): Promise<
 export async function signUp(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = field(formData, 'email').trim();
   const password = field(formData, 'password');
-  if (!email || !password) return { status: 'error', message: 'Informe e-mail e senha.' };
+  if (!email || !password) return fail('Informe e-mail e senha.', email);
   if (password.length < MIN_PASSWORD) {
-    return { status: 'error', message: 'A senha precisa ter pelo menos 6 caracteres.' };
+    return fail('A senha precisa ter pelo menos 6 caracteres.', email);
   }
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) return { status: 'error', message: authErrorMessage(error) };
+  if (error) return fail(authErrorMessage(error), email);
 
   // Com confirmação ligada, e-mail já cadastrado volta sem erro e sem identidades.
   if (data.user?.identities?.length === 0) {
-    return { status: 'error', message: 'Este e-mail já tem conta.' };
+    return fail('Este e-mail já tem conta.', email);
   }
   if (data.session) redirect(safeRedirectPath(field(formData, 'voltar')));
 
@@ -63,13 +67,13 @@ export async function requestPasswordReset(
   formData: FormData,
 ): Promise<AuthFormState> {
   const email = field(formData, 'email').trim();
-  if (!email) return { status: 'error', message: 'Informe seu e-mail.' };
+  if (!email) return fail('Informe seu e-mail.', email);
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email);
   // Resposta neutra para não revelar quais e-mails têm conta; só o limite de envio aparece.
   if (error?.code && RATE_LIMIT_CODES.has(error.code)) {
-    return { status: 'error', message: authErrorMessage(error) };
+    return fail(authErrorMessage(error), email);
   }
   return { status: 'sent', message: 'Se houver uma conta com esse e-mail, enviamos um link.' };
 }

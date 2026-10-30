@@ -56,6 +56,7 @@ export function AuthForm({ voltar, erro }: { voltar: string; erro?: string }) {
             name="email"
             required
             autoComplete="email"
+            defaultValue={state.email}
             className={inputClass}
           />
         </label>

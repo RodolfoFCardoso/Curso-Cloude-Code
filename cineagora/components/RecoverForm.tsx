@@ -18,7 +18,14 @@ export function RecoverForm({ erro }: { erro?: string }) {
       <form action={formAction} className="flex flex-col gap-3">
         <label className="flex flex-col gap-1 text-sm text-tela">
           E-mail
-          <input type="email" name="email" required autoComplete="email" className={inputClass} />
+          <input
+            type="email"
+            name="email"
+            required
+            autoComplete="email"
+            defaultValue={state.email}
+            className={inputClass}
+          />
         </label>
         <button
           type="submit"

@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { Big_Shoulders, Hanken_Grotesk } from 'next/font/google';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { PreferencesProvider } from '@/lib/store/PreferencesProvider';
+import { getSupabaseEnv, requireSupabaseEnv } from '@/lib/supabase/env';
+import { getCurrentUser } from '@/lib/supabase/server';
 import { logTmdbError } from '@/lib/tmdb/errors';
 import { getAvailableProviders } from '@/lib/tmdb/service';
 import type { WatchProvider } from '@/lib/tmdb/types';
@@ -34,15 +37,30 @@ async function loadProviders(): Promise<WatchProvider[] | null> {
   }
 }
 
+let warned = false;
+function warnSupabaseMissing() {
+  if (warned) return;
+  warned = true;
+  try {
+    requireSupabaseEnv();
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : 'Supabase não configurado');
+  }
+}
+
 export default async function RootLayout({ children }: LayoutProps<'/'>) {
-  const providers = await loadProviders();
+  const [providers, user] = await Promise.all([loadProviders(), getCurrentUser()]);
+  const available = getSupabaseEnv() !== null;
+  if (!available) warnSupabaseMissing();
   return (
     <html lang="pt-BR" className={`${hanken.variable} ${shoulders.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-veludo text-tela">
         <PreferencesProvider>
-          <Header providers={providers} />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <AuthProvider user={user} available={available}>
+            <Header providers={providers} />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </AuthProvider>
         </PreferencesProvider>
       </body>
     </html>

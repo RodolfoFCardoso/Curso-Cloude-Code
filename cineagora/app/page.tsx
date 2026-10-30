@@ -1,4 +1,3 @@
-import { FavoritesRow } from '@/components/FavoritesRow';
 import { FilterableRow } from '@/components/FilterableRow';
 import { HomeHero } from '@/components/HomeHero';
 import { RatingFilter } from '@/components/RatingFilter';
@@ -13,7 +12,6 @@ export default async function Home() {
       <h1 className="sr-only">CineAgora: o que assistir nos seus streamings</h1>
       {featured.length > 0 ? <HomeHero featured={featured} /> : <div className="h-20" />}
       <div className="mt-14">
-        <FavoritesRow />
         <RatingFilter />
         <RailStatusProvider total={rails.length}>
           {rails.map((rail) => (

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import type { FeaturedMovie } from '@/lib/featured';
 import { formatRating, formatRuntime } from '@/lib/format';
 import { usePreferences } from '@/lib/store/PreferencesProvider';
-import { FavoriteButton } from './FavoriteButton';
+import { MovieStatusButtons } from './MovieStatusButtons';
 import { ProviderBadge } from './ProviderBadge';
 import { Screen } from './Screen';
 
@@ -93,7 +93,7 @@ export function HomeHero({ featured }: { featured: FeaturedMovie[] }) {
                 >
                   Ver detalhes
                 </Link>
-                <FavoriteButton movie={movie} />
+                <MovieStatusButtons movie={movie} />
               </div>
             </div>
           </div>

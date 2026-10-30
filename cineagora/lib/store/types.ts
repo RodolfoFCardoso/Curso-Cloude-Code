@@ -35,11 +35,3 @@ export interface MovieListStore {
   reload(): Promise<void>;
   subscribe(listener: () => void): () => void;
 }
-
-export interface FavoritesStore {
-  /** Mais recente primeiro; mesma referência enquanto não mudar. */
-  list(): Movie[];
-  has(id: number): boolean;
-  toggle(movie: Movie): void;
-  subscribe(listener: () => void): () => void;
-}

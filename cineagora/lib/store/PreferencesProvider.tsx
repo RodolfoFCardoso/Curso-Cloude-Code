@@ -1,12 +1,10 @@
 'use client';
 
 import { createContext, useContext, useState, useSyncExternalStore, type ReactNode } from 'react';
-import type { Movie } from '../tmdb/types';
-import { createLocalFavoritesStore } from './local-favorites';
 import { createLocalPreferencesStore } from './local-preferences';
-import type { FavoritesStore, MinRating, PreferencesStore } from './types';
+import type { MinRating, PreferencesStore } from './types';
 
-type Stores = { preferences: PreferencesStore; favorites: FavoritesStore };
+type Stores = { preferences: PreferencesStore };
 
 const StoresContext = createContext<Stores | null>(null);
 
@@ -20,16 +18,13 @@ function browserStorage(): Storage | null {
 
 export function PreferencesProvider({
   store,
-  favoritesStore,
   children,
 }: {
   store?: PreferencesStore;
-  favoritesStore?: FavoritesStore;
   children: ReactNode;
 }) {
   const [value] = useState<Stores>(() => ({
     preferences: store ?? createLocalPreferencesStore(browserStorage()),
-    favorites: favoritesStore ?? createLocalFavoritesStore(browserStorage()),
   }));
   return <StoresContext.Provider value={value}>{children}</StoresContext.Provider>;
 }
@@ -68,19 +63,4 @@ export function useMinRating(): {
     serverSnapshot,
   );
   return { minRating, setMinRating: preferences.setMinRating };
-}
-
-/** `favorites === null` enquanto não hidratou. */
-export function useFavorites(): {
-  favorites: Movie[] | null;
-  isFavorite(id: number): boolean;
-  toggle(movie: Movie): void;
-} {
-  const { favorites: store } = useStores();
-  const favorites = useSyncExternalStore(store.subscribe, store.list, serverSnapshot);
-  return {
-    favorites,
-    isFavorite: (id) => favorites?.some((m) => m.id === id) ?? false,
-    toggle: store.toggle,
-  };
 }

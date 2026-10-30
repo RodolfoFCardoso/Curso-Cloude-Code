@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { FavoriteButton } from '@/components/FavoriteButton';
+import { MovieStatusButtons } from '@/components/MovieStatusButtons';
 import { Row } from '@/components/Row';
 import { Screen } from '@/components/Screen';
 import { WhereToWatch } from '@/components/WhereToWatch';
@@ -77,7 +77,7 @@ export default async function MoviePage({ params }: Props) {
                 <span key={String(f)}>{f}</span>
               ))}
             </p>
-            <FavoriteButton
+            <MovieStatusButtons
               movie={{
                 id: movie.id,
                 title: movie.title,

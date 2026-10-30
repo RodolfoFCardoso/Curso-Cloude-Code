@@ -7,12 +7,20 @@ import { EMPTY_PROVIDERS } from '@/lib/tmdb/providers-mapper';
 import type { RawMovieDetails } from '@/lib/tmdb/raw';
 import * as service from '@/lib/tmdb/service';
 import { PreferencesProvider } from '@/lib/store/PreferencesProvider';
-import { createLocalFavoritesStore } from '@/lib/store/local-favorites';
+import { createMemoryMovieListStore } from '@/lib/store/memory-movie-list';
+import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { createLocalPreferencesStore } from '@/lib/store/local-preferences';
 import Page from './page';
 
 vi.mock('server-only', () => ({}));
+vi.mock('@/lib/supabase/browser', () => ({
+  getSupabaseBrowserClient: () => ({
+    auth: { onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }) },
+  }),
+}));
 vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/filme/550',
   notFound: vi.fn(() => {
     throw new Error('NEXT_NOT_FOUND');
   }),
@@ -38,11 +46,10 @@ const details = mapMovieDetails(detailsFixture as RawMovieDetails);
 function renderPage(id: string) {
   return Page({ params: Promise.resolve({ id }) } as Parameters<typeof Page>[0]).then((ui) =>
     render(
-      <PreferencesProvider
-        store={createLocalPreferencesStore(null)}
-        favoritesStore={createLocalFavoritesStore(null)}
-      >
-        {ui}
+      <PreferencesProvider store={createLocalPreferencesStore(null)}>
+        <AuthProvider user={null} available makeStore={() => createMemoryMovieListStore()}>
+          {ui}
+        </AuthProvider>
       </PreferencesProvider>,
     ),
   );
@@ -71,7 +78,8 @@ describe('/filme/[id]', () => {
     expect(screen.getByText('Ator 0')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Filmes parecidos' })).toBeInTheDocument();
     expect(s.getMovieDetails).toHaveBeenCalledWith(550);
-    expect(screen.getByRole('button', { name: 'Adicionar à minha lista' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Quero assistir' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Já assisti' })).toBeInTheDocument();
   });
 
   it.each(['abc', '0', '-3', '1.5'])('id inválido (%s) vira 404 sem chamar a TMDB', async (id) => {

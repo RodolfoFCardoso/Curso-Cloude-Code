@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { FavoriteButton } from '@/components/FavoriteButton';
 import { Row } from '@/components/Row';
 import { WhereToWatch } from '@/components/WhereToWatch';
 import { formatRating, formatRuntime } from '@/lib/format';
@@ -89,6 +90,17 @@ export default async function MoviePage({ params }: Props) {
           <p className="leading-relaxed text-zinc-300">
             {movie.overview || 'Sinopse não disponível.'}
           </p>
+          <FavoriteButton
+            movie={{
+              id: movie.id,
+              title: movie.title,
+              year: movie.year,
+              rating: movie.rating,
+              posterUrl: movie.posterUrl,
+              backdropUrl: movie.backdropUrl,
+              genreIds: movie.genreIds,
+            }}
+          />
           <WhereToWatch providers={providers} />
         </div>
       </div>

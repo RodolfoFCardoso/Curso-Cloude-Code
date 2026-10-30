@@ -1,30 +1,43 @@
 'use client';
 
 import { createContext, useContext, useState, useSyncExternalStore, type ReactNode } from 'react';
+import type { Movie } from '../tmdb/types';
+import { createLocalFavoritesStore } from './local-favorites';
 import { createLocalPreferencesStore } from './local-preferences';
-import type { PreferencesStore } from './types';
+import type { FavoritesStore, PreferencesStore } from './types';
 
-const PreferencesContext = createContext<PreferencesStore | null>(null);
+type Stores = { preferences: PreferencesStore; favorites: FavoritesStore };
 
-function defaultStore(): PreferencesStore {
-  let storage: Storage | null = null;
+const StoresContext = createContext<Stores | null>(null);
+
+function browserStorage(): Storage | null {
   try {
-    storage = typeof window !== 'undefined' ? window.localStorage : null;
+    return typeof window !== 'undefined' ? window.localStorage : null;
   } catch {
-    storage = null;
+    return null;
   }
-  return createLocalPreferencesStore(storage);
 }
 
 export function PreferencesProvider({
   store,
+  favoritesStore,
   children,
 }: {
   store?: PreferencesStore;
+  favoritesStore?: FavoritesStore;
   children: ReactNode;
 }) {
-  const [value] = useState(() => store ?? defaultStore());
-  return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>;
+  const [value] = useState<Stores>(() => ({
+    preferences: store ?? createLocalPreferencesStore(browserStorage()),
+    favorites: favoritesStore ?? createLocalFavoritesStore(browserStorage()),
+  }));
+  return <StoresContext.Provider value={value}>{children}</StoresContext.Provider>;
+}
+
+function useStores(): Stores {
+  const stores = useContext(StoresContext);
+  if (!stores) throw new Error('usePreferences precisa estar dentro de <PreferencesProvider>');
+  return stores;
 }
 
 const serverSnapshot = () => null;
@@ -34,12 +47,26 @@ export function usePreferences(): {
   selected: number[] | null;
   setSelected(ids: number[]): void;
 } {
-  const store = useContext(PreferencesContext);
-  if (!store) throw new Error('usePreferences precisa estar dentro de <PreferencesProvider>');
+  const { preferences } = useStores();
   const selected = useSyncExternalStore(
-    store.subscribe,
-    store.getSelectedProviders,
+    preferences.subscribe,
+    preferences.getSelectedProviders,
     serverSnapshot,
   );
-  return { selected, setSelected: store.setSelectedProviders };
+  return { selected, setSelected: preferences.setSelectedProviders };
+}
+
+/** `favorites === null` enquanto não hidratou. */
+export function useFavorites(): {
+  favorites: Movie[] | null;
+  isFavorite(id: number): boolean;
+  toggle(movie: Movie): void;
+} {
+  const { favorites: store } = useStores();
+  const favorites = useSyncExternalStore(store.subscribe, store.list, serverSnapshot);
+  return {
+    favorites,
+    isFavorite: (id) => favorites?.some((m) => m.id === id) ?? false,
+    toggle: store.toggle,
+  };
 }

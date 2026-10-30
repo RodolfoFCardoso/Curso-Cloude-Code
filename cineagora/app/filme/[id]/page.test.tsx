@@ -6,6 +6,9 @@ import { mapMovieDetails } from '@/lib/tmdb/mappers';
 import { EMPTY_PROVIDERS } from '@/lib/tmdb/providers-mapper';
 import type { RawMovieDetails } from '@/lib/tmdb/raw';
 import * as service from '@/lib/tmdb/service';
+import { PreferencesProvider } from '@/lib/store/PreferencesProvider';
+import { createLocalFavoritesStore } from '@/lib/store/local-favorites';
+import { createLocalPreferencesStore } from '@/lib/store/local-preferences';
 import Page from './page';
 
 vi.mock('server-only', () => ({}));
@@ -34,7 +37,14 @@ const details = mapMovieDetails(detailsFixture as RawMovieDetails);
 
 function renderPage(id: string) {
   return Page({ params: Promise.resolve({ id }) } as Parameters<typeof Page>[0]).then((ui) =>
-    render(ui),
+    render(
+      <PreferencesProvider
+        store={createLocalPreferencesStore(null)}
+        favoritesStore={createLocalFavoritesStore(null)}
+      >
+        {ui}
+      </PreferencesProvider>,
+    ),
   );
 }
 
@@ -61,6 +71,7 @@ describe('/filme/[id]', () => {
     expect(screen.getByText('Ator 0')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Filmes parecidos' })).toBeInTheDocument();
     expect(s.getMovieDetails).toHaveBeenCalledWith(550);
+    expect(screen.getByRole('button', { name: 'Adicionar à minha lista' })).toBeInTheDocument();
   });
 
   it.each(['abc', '0', '-3', '1.5'])('id inválido (%s) vira 404 sem chamar a TMDB', async (id) => {

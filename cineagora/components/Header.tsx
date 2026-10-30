@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import type { WatchProvider } from '@/lib/tmdb/types';
 import { HeaderShell } from './HeaderShell';
 import { Logo } from './Logo';
@@ -27,7 +28,10 @@ export function Header({ providers }: { providers: WatchProvider[] | null }) {
           </svg>
         </Link>
         <ProviderFilter providers={providers} />
-        <UserMenu />
+        {/* UserMenu lê useSearchParams: em rotas pré-renderizadas precisa de um limite de Suspense. */}
+        <Suspense fallback={<span aria-hidden="true" className="h-10 w-10 shrink-0" />}>
+          <UserMenu />
+        </Suspense>
       </div>
     </HeaderShell>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { signOut } from '@/app/entrar/actions';
 import { useAuth } from '@/lib/auth/AuthProvider';
@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 export function UserMenu() {
   const { user, available } = useAuth();
   const pathname = usePathname();
+  const query = useSearchParams().toString();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -38,8 +39,9 @@ export function UserMenu() {
   }
 
   if (!user) {
-    const href =
-      pathname === '/entrar' ? '/entrar' : `/entrar?voltar=${encodeURIComponent(pathname)}`;
+    const onLogin = pathname === '/entrar' || pathname.startsWith('/entrar/');
+    const here = pathname + (query ? `?${query}` : '');
+    const href = onLogin ? '/entrar' : `/entrar?voltar=${encodeURIComponent(here)}`;
     return (
       <Link
         href={href}

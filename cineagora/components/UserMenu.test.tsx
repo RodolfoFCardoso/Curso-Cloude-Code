@@ -8,18 +8,23 @@ const state = vi.hoisted(() => ({
   user: null as AuthUser | null,
   available: true,
   pathname: '/filme/3',
+  search: '',
 }));
 
 vi.mock('@/lib/auth/AuthProvider', () => ({
   useAuth: () => ({ user: state.user, available: state.available }),
 }));
-vi.mock('next/navigation', () => ({ usePathname: () => state.pathname }));
+vi.mock('next/navigation', () => ({
+  usePathname: () => state.pathname,
+  useSearchParams: () => new URLSearchParams(state.search),
+}));
 vi.mock('@/app/entrar/actions', () => ({ signOut: vi.fn() }));
 
 beforeEach(() => {
   state.user = null;
   state.available = true;
   state.pathname = '/filme/3';
+  state.search = '';
 });
 
 describe('UserMenu', () => {
@@ -33,6 +38,26 @@ describe('UserMenu', () => {
 
   it('em /entrar o link não leva voltar', () => {
     state.pathname = '/entrar';
+    render(<UserMenu />);
+    expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute('href', '/entrar');
+  });
+
+  it('voltar inclui a query string atual', () => {
+    state.pathname = '/';
+    state.search = 'aba=ja-assisti';
+    render(<UserMenu />);
+    expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute(
+      'href',
+      '/entrar?voltar=%2F%3Faba%3Dja-assisti',
+    );
+  });
+
+  it.each([
+    ['/entrar', 'voltar=%2Ffilme%2F3'],
+    ['/entrar/recuperar', ''],
+  ])('em %s o link vai para /entrar sem voltar', (pathname, search) => {
+    state.pathname = pathname;
+    state.search = search;
     render(<UserMenu />);
     expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute('href', '/entrar');
   });

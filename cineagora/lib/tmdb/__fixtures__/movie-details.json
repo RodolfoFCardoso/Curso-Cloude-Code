@@ -1,0 +1,296 @@
+{
+  "id": 550,
+  "title": "Clube da Luta",
+  "release_date": "1999-10-15",
+  "vote_average": 8.438,
+  "vote_count": 30000,
+  "poster_path": "/fight-poster.jpg",
+  "backdrop_path": "/fight-backdrop.jpg",
+  "runtime": 139,
+  "overview": "Um homem deprimido conhece um vendedor de sabão.",
+  "genres": [
+    {
+      "id": 18,
+      "name": "Drama"
+    },
+    {
+      "id": 53,
+      "name": "Thriller"
+    }
+  ],
+  "videos": {
+    "results": [
+      {
+        "key": "teaser-key",
+        "site": "YouTube",
+        "type": "Teaser",
+        "iso_639_1": "en",
+        "official": true
+      },
+      {
+        "key": "en-key",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "en",
+        "official": true
+      },
+      {
+        "key": "vimeo-key",
+        "site": "Vimeo",
+        "type": "Trailer",
+        "iso_639_1": "pt",
+        "official": true
+      },
+      {
+        "key": "pt-key",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "pt",
+        "official": false
+      }
+    ]
+  },
+  "credits": {
+    "cast": [
+      {
+        "id": 111,
+        "name": "Ator 11",
+        "character": "Papel 11",
+        "profile_path": null,
+        "order": 11
+      },
+      {
+        "id": 110,
+        "name": "Ator 10",
+        "character": "Papel 10",
+        "profile_path": "/p10.jpg",
+        "order": 10
+      },
+      {
+        "id": 109,
+        "name": "Ator 9",
+        "character": "Papel 9",
+        "profile_path": null,
+        "order": 9
+      },
+      {
+        "id": 108,
+        "name": "Ator 8",
+        "character": "Papel 8",
+        "profile_path": "/p8.jpg",
+        "order": 8
+      },
+      {
+        "id": 107,
+        "name": "Ator 7",
+        "character": "Papel 7",
+        "profile_path": null,
+        "order": 7
+      },
+      {
+        "id": 106,
+        "name": "Ator 6",
+        "character": "Papel 6",
+        "profile_path": "/p6.jpg",
+        "order": 6
+      },
+      {
+        "id": 105,
+        "name": "Ator 5",
+        "character": "Papel 5",
+        "profile_path": null,
+        "order": 5
+      },
+      {
+        "id": 104,
+        "name": "Ator 4",
+        "character": "Papel 4",
+        "profile_path": "/p4.jpg",
+        "order": 4
+      },
+      {
+        "id": 103,
+        "name": "Ator 3",
+        "character": "Papel 3",
+        "profile_path": null,
+        "order": 3
+      },
+      {
+        "id": 102,
+        "name": "Ator 2",
+        "character": "Papel 2",
+        "profile_path": "/p2.jpg",
+        "order": 2
+      },
+      {
+        "id": 101,
+        "name": "Ator 1",
+        "character": "Papel 1",
+        "profile_path": null,
+        "order": 1
+      },
+      {
+        "id": 100,
+        "name": "Ator 0",
+        "character": "Papel 0",
+        "profile_path": "/p0.jpg",
+        "order": 0
+      }
+    ]
+  },
+  "similar": {
+    "page": 1,
+    "results": [
+      {
+        "id": 2000,
+        "title": "Parecido 0",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s0.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2001,
+        "title": "Parecido 1",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s1.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2002,
+        "title": "Parecido 2",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s2.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2003,
+        "title": "Parecido 3",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s3.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2004,
+        "title": "Parecido 4",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s4.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2005,
+        "title": "Parecido 5",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s5.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2006,
+        "title": "Parecido 6",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s6.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2007,
+        "title": "Parecido 7",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s7.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2008,
+        "title": "Parecido 8",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s8.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2009,
+        "title": "Parecido 9",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s9.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2010,
+        "title": "Parecido 10",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s10.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2011,
+        "title": "Parecido 11",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s11.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2012,
+        "title": "Parecido 12",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s12.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2013,
+        "title": "Parecido 13",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s13.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      },
+      {
+        "id": 2014,
+        "title": "Parecido 14",
+        "release_date": "2001-01-01",
+        "vote_average": 7,
+        "vote_count": 10,
+        "poster_path": "/s14.jpg",
+        "backdrop_path": null,
+        "genre_ids": [18]
+      }
+    ]
+  }
+}

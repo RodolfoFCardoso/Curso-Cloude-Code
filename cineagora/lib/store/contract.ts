@@ -182,14 +182,19 @@ export function runMovieListStoreContract(name: string, makeStore: () => Promise
       s.setStatus(movie(3), 'want');
       expect(s.list('want')).not.toBe(want);
       expect(s.list('want').map((m) => m.id)).toEqual([3, 1]);
+      const watched = s.list('watched');
+      const wantNow = s.list('want');
+      s.setStatus(movie(9), null);
+      expect(s.list('watched')).toBe(watched);
+      expect(s.list('want')).toBe(wantNow);
     });
 
     it('reload resolve sem mudar o estado', async () => {
       const s = await makeStore();
       s.setStatus(movie(1), 'want');
-      const want = s.list('want');
       await s.reload();
-      expect(s.list('want')).toBe(want);
+      expect(s.list('want')).toEqual([movie(1)]);
+      expect(s.list('watched')).toEqual([]);
       expect(s.statusOf(1)).toBe('want');
     });
   });

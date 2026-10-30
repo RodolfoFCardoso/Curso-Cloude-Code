@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { safeRedirectPath } from './safe-redirect';
+import { afterLoginPath, safeRedirectPath } from './safe-redirect';
 
 describe('safeRedirectPath', () => {
   it.each([
@@ -16,4 +16,18 @@ describe('safeRedirectPath', () => {
   it('usa o fallback informado', () => {
     expect(safeRedirectPath('//x', '/conta/senha')).toBe('/conta/senha');
   });
+});
+
+describe('afterLoginPath', () => {
+  it.each([
+    ['/filme/12', '/filme/12'],
+    ['/?aba=ja-assisti', '/?aba=ja-assisti'],
+    ['/conta/senha', '/conta/senha'],
+    ['/entrada', '/entrada'],
+  ])('mantém %s', (v, out) => expect(afterLoginPath(v)).toBe(out));
+
+  it.each(['/entrar', '/entrar?voltar=/entrar', '/entrar/recuperar', '/entrar#x', '//evil.com', 'https://evil.com', undefined])(
+    'troca %s por /',
+    (v) => expect(afterLoginPath(v)).toBe('/'),
+  );
 });

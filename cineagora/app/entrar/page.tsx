@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { AuthForm } from '@/components/AuthForm';
-import { safeRedirectPath } from '@/lib/auth/safe-redirect';
+import { afterLoginPath } from '@/lib/auth/safe-redirect';
 import { getCurrentUser } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Entrar' };
@@ -12,7 +12,7 @@ function first(value: string | string[] | undefined): string | undefined {
 
 export default async function EntrarPage({ searchParams }: PageProps<'/entrar'>) {
   const params = await searchParams;
-  const voltar = safeRedirectPath(first(params.voltar));
+  const voltar = afterLoginPath(first(params.voltar));
   const erro = first(params.erro);
 
   if (await getCurrentUser()) redirect(voltar);

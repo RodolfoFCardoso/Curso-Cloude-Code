@@ -1,8 +1,10 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { authErrorMessage } from '@/lib/auth/messages';
-import { safeRedirectPath } from '@/lib/auth/safe-redirect';
+import { RECOVERY_COOKIE } from '@/lib/auth/recovery';
+import { afterLoginPath } from '@/lib/auth/safe-redirect';
 import type { AuthFormState } from '@/lib/auth/types';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -26,8 +28,10 @@ export async function signIn(_prev: AuthFormState, formData: FormData): Promise<
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return fail(authErrorMessage(error), email);
 
+  // Uma recuperação de senha pendente de outra sessão não vale para este login.
+  (await cookies()).delete(RECOVERY_COOKIE);
   // redirect() lança; fica fora de qualquer try/catch.
-  redirect(safeRedirectPath(field(formData, 'voltar')));
+  redirect(afterLoginPath(field(formData, 'voltar')));
 }
 
 export async function signUp(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -46,7 +50,7 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
   if (data.user?.identities?.length === 0) {
     return fail('Este e-mail já tem conta.', email);
   }
-  if (data.session) redirect(safeRedirectPath(field(formData, 'voltar')));
+  if (data.session) redirect(afterLoginPath(field(formData, 'voltar')));
 
   return {
     status: 'check-email',
@@ -56,7 +60,9 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
 
 export async function signOut(): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  await supabase.auth.signOut();
+  // 'local': encerra só esta sessão, sem derrubar o usuário nos outros dispositivos.
+  await supabase.auth.signOut({ scope: 'local' });
+  (await cookies()).delete(RECOVERY_COOKIE);
   redirect('/');
 }
 

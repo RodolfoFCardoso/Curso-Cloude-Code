@@ -5,7 +5,9 @@ const h = vi.hoisted(() => ({
   signUp: vi.fn(),
   signOut: vi.fn(),
   resetPasswordForEmail: vi.fn(),
+  deleteCookie: vi.fn(),
 }));
+vi.mock('next/headers', () => ({ cookies: async () => ({ delete: h.deleteCookie }) }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
@@ -38,6 +40,22 @@ describe('signIn', () => {
       signIn(idle, form({ email: 'a@b.c', password: '123456', voltar: '/filme/12' })),
     ).rejects.toThrow('REDIRECT:/filme/12');
   });
+  it('apaga o cookie de recuperação ao entrar', async () => {
+    h.signInWithPassword.mockResolvedValue({ error: null });
+    await expect(
+      signIn(idle, form({ email: 'a@b.c', password: '123456', voltar: '/' })),
+    ).rejects.toThrow('REDIRECT:/');
+    expect(h.deleteCookie).toHaveBeenCalledWith('cineagora_recovery');
+  });
+  it.each(['/entrar', '/entrar?voltar=/entrar', '/entrar/recuperar'])(
+    'voltar %s não volta para o login (vai para /)',
+    async (voltar) => {
+      h.signInWithPassword.mockResolvedValue({ error: null });
+      await expect(
+        signIn(idle, form({ email: 'a@b.c', password: '123456', voltar })),
+      ).rejects.toThrow(/^REDIRECT:\/$/);
+    },
+  );
   it('voltar externo vai para /', async () => {
     h.signInWithPassword.mockResolvedValue({ error: null });
     await expect(
@@ -99,6 +117,13 @@ describe('signUp', () => {
       email: 'a@b.c',
     });
   });
+  it('com sessão e voltar /entrar vai para /', async () => {
+    h.signUp.mockResolvedValue({
+      data: { user: { identities: [{}] }, session: { access_token: 't' } },
+      error: null,
+    });
+    await expect(signUp(idle, form({ ...ok, voltar: '/entrar' }))).rejects.toThrow(/^REDIRECT:\/$/);
+  });
   it('com sessão redireciona', async () => {
     h.signUp.mockResolvedValue({
       data: { user: { identities: [{}] }, session: { access_token: 't' } },
@@ -117,10 +142,11 @@ describe('signUp', () => {
 });
 
 describe('signOut', () => {
-  it('sai e volta para a home', async () => {
+  it('sai só deste dispositivo, apaga o cookie de recuperação e volta para a home', async () => {
     h.signOut.mockResolvedValue({ error: null });
     await expect(signOut()).rejects.toThrow('REDIRECT:/');
-    expect(h.signOut).toHaveBeenCalled();
+    expect(h.signOut).toHaveBeenCalledWith({ scope: 'local' });
+    expect(h.deleteCookie).toHaveBeenCalledWith('cineagora_recovery');
   });
 });
 

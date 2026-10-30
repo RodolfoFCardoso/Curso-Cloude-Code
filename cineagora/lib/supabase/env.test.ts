@@ -26,7 +26,13 @@ describe('requireSupabaseEnv', () => {
   it('lança mensagem clara sem vazar valores', () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', '');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'segredo');
-    expect(() => requireSupabaseEnv()).toThrow(/NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
-    expect(() => requireSupabaseEnv()).not.toThrow(/segredo/);
+    let message = '';
+    try {
+      requireSupabaseEnv();
+    } catch (error) {
+      message = (error as Error).message;
+    }
+    expect(message).toMatch(/NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
+    expect(message).not.toContain('segredo');
   });
 });

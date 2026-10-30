@@ -44,6 +44,10 @@ export function parseProviderIds(s: string | null): number[] {
   return [...new Set(ids)];
 }
 
+export function parseMovieId(s: string): number | null {
+  return POSITIVE_INT.test(s) ? Number(s) : null;
+}
+
 export function fetchRailMovies(key: RailKey, providerIds: number[] = []): Promise<Movie[]> {
   const genre = GENRE_KEY.exec(key);
   if (genre) return getByGenre(Number(genre[1]), providerIds);

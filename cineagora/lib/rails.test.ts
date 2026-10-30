@@ -4,6 +4,7 @@ import {
   fetchRailMovies,
   HomeUnavailableError,
   loadHomeRails,
+  parseMovieId,
   parseProviderIds,
   parseRailKey,
 } from './rails';
@@ -145,5 +146,15 @@ describe('loadHomeRails', () => {
     s.getNowPlaying.mockRejectedValue(boom);
     s.getGenres.mockRejectedValue(boom);
     await expect(loadHomeRails()).rejects.toBeInstanceOf(HomeUnavailableError);
+  });
+});
+
+describe('parseMovieId', () => {
+  it('aceita inteiros positivos', () => {
+    expect(parseMovieId('550')).toBe(550);
+  });
+
+  it.each(['abc', '0', '-3', '1.5', '', '550abc'])('rejeita %s', (s) => {
+    expect(parseMovieId(s)).toBeNull();
   });
 });

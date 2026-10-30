@@ -1,5 +1,5 @@
 import 'server-only';
-import { filterRail } from './filter';
+import { filterRail, type FilterResult } from './filter';
 import { logTmdbError } from './tmdb/errors';
 import {
   getByGenre,
@@ -9,7 +9,7 @@ import {
   getTrending,
   getWatchProviders,
 } from './tmdb/service';
-import type { Movie, RailItem } from './tmdb/types';
+import type { Movie } from './tmdb/types';
 
 export type RailKey = 'trending' | 'popular' | 'now_playing' | `genre-${number}`;
 export type HomeRail = { key: RailKey; title: string; movies: Movie[] };
@@ -54,7 +54,7 @@ export function fetchRailMovies(key: RailKey, providerIds: number[] = []): Promi
   return FIXED_RAILS.find((r) => r.key === key)!.load();
 }
 
-export async function fetchRailItems(key: RailKey, providerIds: number[]): Promise<RailItem[]> {
+export async function fetchRailItems(key: RailKey, providerIds: number[]): Promise<FilterResult> {
   const movies = await fetchRailMovies(key, providerIds);
   return filterRail(movies, providerIds, getWatchProviders);
 }

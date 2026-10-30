@@ -1,11 +1,12 @@
 import { act, render, screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createLocalPreferencesStore } from '@/lib/store/local-preferences';
 import { PreferencesProvider } from '@/lib/store/PreferencesProvider';
 import type { PreferencesStore } from '@/lib/store/types';
 import type { Movie, RailItem } from '@/lib/tmdb/types';
 import { FilterableRow } from './FilterableRow';
-import { RailStatusProvider, useRailStatuses } from './RailStatus';
+import { RailStatusProvider, useRailRetry, useRailStatuses } from './RailStatus';
 
 const movie = (id: number): Movie => ({
   id,
@@ -27,7 +28,13 @@ function ok(items: RailItem[]) {
 
 function StatusProbe() {
   const statuses = useRailStatuses();
-  return <output data-testid="status">{statuses.popular ?? 'none'}</output>;
+  const retry = useRailRetry();
+  return (
+    <>
+      <output data-testid="status">{statuses.popular ?? 'none'}</output>
+      <button onClick={retry}>retry-probe</button>
+    </>
+  );
 }
 
 function setup(store: PreferencesStore) {
@@ -61,6 +68,16 @@ afterEach(() => {
 });
 
 describe('FilterableRow', () => {
+  it('antes de conhecer o filtro salvo (servidor) mostra esqueleto, não filmes sem filtro', () => {
+    const html = renderToString(
+      <PreferencesProvider store={filtered([8])}>
+        <FilterableRow railKey="popular" title="Populares" initialMovies={[movie(1)]} />
+      </PreferencesProvider>,
+    );
+    expect(html).toContain('Carregando Populares');
+    expect(html).not.toContain('/filme/1');
+  });
+
   it('sem filtro mostra os filmes iniciais sem chamar a API', () => {
     setup(createLocalPreferencesStore(null));
     expect(screen.getAllByRole('link')).toHaveLength(3);
@@ -125,6 +142,17 @@ describe('FilterableRow', () => {
     await act(async () => resolveFirst(ok([{ movie: movie(1), badges: [netflix] }])));
     expect(screen.queryByAltText('Netflix')).not.toBeInTheDocument();
     expect(screen.getByAltText('Max')).toBeInTheDocument();
+  });
+
+  it('nova tentativa refaz a busca após erro', async () => {
+    fetchMock
+      .mockRejectedValueOnce(new TypeError('offline'))
+      .mockResolvedValueOnce(ok([{ movie: movie(2), badges: [netflix] }]));
+    setup(filtered([8]));
+    expect(await screen.findByText('error')).toBeInTheDocument();
+    act(() => screen.getByRole('button', { name: 'retry-probe' }).click());
+    expect(await screen.findByAltText('Netflix')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it('voltar para sem filtro mostra os iniciais de novo', async () => {

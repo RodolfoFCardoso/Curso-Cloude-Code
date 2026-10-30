@@ -7,6 +7,7 @@ import { OPEN_PROVIDER_FILTER_EVENT } from './ProviderFilter';
 import {
   FilteredEmptyNotice,
   RailStatusProvider,
+  useRailAttempt,
   useReportRailStatus,
   type RailState,
 } from './RailStatus';
@@ -14,6 +15,10 @@ import {
 function Reporter({ id, state }: { id: string; state: RailState }) {
   useReportRailStatus(id, state);
   return null;
+}
+
+function AttemptProbe() {
+  return <output data-testid="attempt">{useRailAttempt()}</output>;
 }
 
 function setup(states: RailState[], selected: number[] = [8]) {
@@ -26,6 +31,7 @@ function setup(states: RailState[], selected: number[] = [8]) {
           <Reporter key={i} id={`r${i}`} state={s} />
         ))}
         <FilteredEmptyNotice />
+        <AttemptProbe />
       </RailStatusProvider>
     </PreferencesProvider>,
   );
@@ -34,6 +40,17 @@ function setup(states: RailState[], selected: number[] = [8]) {
 const MESSAGE = 'Nenhum filme dos seus streamings nestes trilhos';
 
 describe('FilteredEmptyNotice', () => {
+  it('todos com erro: mostra indisponível e Tentar novamente busca de novo', async () => {
+    setup(['error', 'error']);
+    expect(screen.queryByText(MESSAGE)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Não foi possível carregar seus streamings agora.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('attempt')).toHaveTextContent('0');
+    await userEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(screen.getByTestId('attempt')).toHaveTextContent('1');
+  });
+
   it('aparece quando todos os trilhos ficaram vazios ou com erro', () => {
     setup(['empty', 'error']);
     expect(screen.getByRole('heading', { name: MESSAGE })).toBeInTheDocument();

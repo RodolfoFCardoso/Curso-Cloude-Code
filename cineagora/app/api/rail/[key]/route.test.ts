@@ -33,7 +33,7 @@ describe('GET /api/rail/[key]', () => {
   });
 
   it('sucesso devolve itens com cache público', async () => {
-    fetchRailItems.mockResolvedValue([]);
+    fetchRailItems.mockResolvedValue({ items: [], failures: 0 });
     const res = await call('popular', '?providers=8,abc,,1899');
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ items: [] });
@@ -41,6 +41,13 @@ describe('GET /api/rail/[key]', () => {
     expect(res.headers.get('Cache-Control')).toBe(
       'public, s-maxage=10800, stale-while-revalidate=86400',
     );
+  });
+
+  it('resultado parcial (alguma consulta falhou) não vai para o cache', async () => {
+    fetchRailItems.mockResolvedValue({ items: [], failures: 3 });
+    const res = await call('popular', '?providers=8');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
   });
 
   it('falha da TMDB vira 502 sem detalhes', async () => {

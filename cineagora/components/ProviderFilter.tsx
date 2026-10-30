@@ -1,11 +1,22 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react';
 import { usePreferences } from '@/lib/store/PreferencesProvider';
 import type { WatchProvider } from '@/lib/tmdb/types';
 import { ProviderBadge } from './ProviderBadge';
 
 export const OPEN_PROVIDER_FILTER_EVENT = 'cineagora:open-provider-filter';
+
+function focusables(root: HTMLElement | null): HTMLElement[] {
+  if (!root) return [];
+  return [...root.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])')];
+}
 
 const fold = (s: string) =>
   s
@@ -25,12 +36,38 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
     return () => window.removeEventListener(OPEN_PROVIDER_FILTER_EVENT, openPanel);
   }, []);
 
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    // Foco entra no painel (busca, ou o primeiro botão) e volta ao gatilho ao fechar.
+    const trigger = triggerRef.current;
+    const search = dialogRef.current?.querySelector<HTMLElement>('input[type="search"]');
+    (search ?? focusables(dialogRef.current)[0])?.focus();
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      trigger?.focus();
+    };
   }, [open]);
+
+  function trapTab(e: ReactKeyboardEvent) {
+    if (e.key !== 'Tab') return;
+    const items = focusables(dialogRef.current);
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    if (e.shiftKey && (active === first || !dialogRef.current?.contains(active))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && active === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
 
   const visible = (providers ?? []).filter((p) => fold(p.name).includes(fold(query.trim())));
 
@@ -44,6 +81,7 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         className="shrink-0 rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-300"
@@ -57,6 +95,8 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
           onClick={() => setOpen(false)}
         >
           <div
+            ref={dialogRef}
+            onKeyDown={trapTab}
             role="dialog"
             aria-modal="true"
             aria-label="Meus streamings"

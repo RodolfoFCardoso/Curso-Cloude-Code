@@ -39,7 +39,8 @@ describe('matchesProviders / matchingProviders', () => {
 describe('filterRail', () => {
   it('sem seleção devolve todos sem badges e não consulta provedores', async () => {
     const getProviders = vi.fn();
-    const items = await filterRail([movie(1), movie(2)], [], getProviders);
+    const { items, failures } = await filterRail([movie(1), movie(2)], [], getProviders);
+    expect(failures).toBe(0);
     expect(items).toEqual([
       { movie: movie(1), badges: [] },
       { movie: movie(2), badges: [] },
@@ -54,7 +55,12 @@ describe('filterRail', () => {
       3: EMPTY_PROVIDERS,
       4: providers({ free: [netflix] }),
     };
-    const items = await filterRail([1, 2, 3, 4].map(movie), [8], async (id) => byId[id]);
+    const { items, failures } = await filterRail(
+      [1, 2, 3, 4].map(movie),
+      [8],
+      async (id) => byId[id],
+    );
+    expect(failures).toBe(0);
     expect(items).toEqual([
       { movie: movie(1), badges: [netflix] },
       { movie: movie(4), badges: [netflix] },
@@ -62,10 +68,11 @@ describe('filterRail', () => {
   });
 
   it('falha ao consultar um filme exclui só esse filme', async () => {
-    const items = await filterRail([1, 2, 3].map(movie), [8], async (id) => {
+    const { items, failures } = await filterRail([1, 2, 3].map(movie), [8], async (id) => {
       if (id === 2) throw new Error('TMDB fora');
       return providers({ subscription: [netflix] });
     });
     expect(items.map((i) => i.movie.id)).toEqual([1, 3]);
+    expect(failures).toBe(1);
   });
 });

@@ -15,19 +15,25 @@ export function matchesProviders(p: WatchProviders, selected: number[]): boolean
   return selected.length === 0 || matchingProviders(p, selected).length > 0;
 }
 
+/** `failures` > 0 indica resultado parcial (alguma consulta falhou) — não deve ir para cache. */
+export type FilterResult = { items: RailItem[]; failures: number };
+
 export async function filterRail(
   movies: Movie[],
   selected: number[],
   getProviders: (movieId: number) => Promise<WatchProviders>,
-): Promise<RailItem[]> {
-  if (selected.length === 0) return movies.map((movie) => ({ movie, badges: [] }));
+): Promise<FilterResult> {
+  if (selected.length === 0) {
+    return { items: movies.map((movie) => ({ movie, badges: [] })), failures: 0 };
+  }
 
   const results = await Promise.allSettled(movies.map((m) => getProviders(m.id)));
-  return movies.flatMap((movie, i) => {
+  const items = movies.flatMap((movie, i) => {
     const result = results[i];
     // Sem como confirmar a disponibilidade, o filme sai do trilho filtrado.
     if (result.status === 'rejected') return [];
     const badges = matchingProviders(result.value, selected);
     return badges.length > 0 ? [{ movie, badges }] : [];
   });
+  return { items, failures: results.filter((r) => r.status === 'rejected').length };
 }

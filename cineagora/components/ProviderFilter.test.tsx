@@ -72,4 +72,40 @@ describe('ProviderFilter', () => {
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('ao abrir, o foco vai para a busca do painel', async () => {
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: /meus streamings/i }));
+    expect(screen.getByRole('searchbox', { name: 'Buscar serviço' })).toHaveFocus();
+  });
+
+  it('sem lista, o foco vai para o botão Fechar', async () => {
+    const { user } = setup(null);
+    await user.click(screen.getByRole('button', { name: /meus streamings/i }));
+    expect(screen.getByRole('button', { name: 'Fechar' })).toHaveFocus();
+  });
+
+  it('ao fechar, o foco volta para o botão Meus streamings', async () => {
+    const { user } = setup();
+    const trigger = screen.getByRole('button', { name: /meus streamings/i });
+    act(() => {
+      window.dispatchEvent(new Event(OPEN_PROVIDER_FILTER_EVENT));
+    });
+    expect(trigger).not.toHaveFocus();
+    await user.keyboard('{Escape}');
+    expect(trigger).toHaveFocus();
+  });
+
+  it('Tab fica preso dentro do painel', async () => {
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: /meus streamings/i }));
+    const dialog = screen.getByRole('dialog');
+    for (let i = 0; i < 10; i++) {
+      await user.tab();
+      expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    }
+    screen.getByRole('button', { name: 'Fechar' }).focus();
+    await user.tab({ shift: true });
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+  });
 });

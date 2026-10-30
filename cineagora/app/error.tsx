@@ -2,7 +2,13 @@
 
 import { EmptyState } from '@/components/EmptyState';
 
-export default function HomeError({ reset }: { error: Error; reset: () => void }) {
+export default function HomeError({
+  retry,
+}: {
+  error: unknown;
+  retry: () => void;
+  reset?: () => void;
+}) {
   return (
     <EmptyState
       title="Não foi possível carregar os filmes agora."
@@ -10,7 +16,7 @@ export default function HomeError({ reset }: { error: Error; reset: () => void }
       action={
         <button
           type="button"
-          onClick={reset}
+          onClick={() => retry()}
           className="rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-300"
         >
           Tentar novamente

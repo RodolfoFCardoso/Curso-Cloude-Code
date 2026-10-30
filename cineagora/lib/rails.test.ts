@@ -85,7 +85,10 @@ describe('fetchRailItems', () => {
     s.getWatchProviders.mockImplementation(async (id) =>
       id === 1 ? { ...EMPTY_PROVIDERS, subscription: [netflix] } : EMPTY_PROVIDERS,
     );
-    expect(await fetchRailItems('popular', [8])).toEqual([{ movie: movie(1), badges: [netflix] }]);
+    expect(await fetchRailItems('popular', [8])).toEqual({
+      items: [{ movie: movie(1), badges: [netflix] }],
+      failures: 0,
+    });
   });
 });
 

@@ -11,8 +11,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ key:
 
   const providerIds = parseProviderIds(new URL(request.url).searchParams.get('providers'));
   try {
-    const items = await fetchRailItems(key, providerIds);
-    return Response.json({ items }, { headers: { 'Cache-Control': CACHE_CONTROL } });
+    const { items, failures } = await fetchRailItems(key, providerIds);
+    // Resultado parcial (TMDB instável) não pode ficar horas no cache da CDN.
+    const cacheControl = failures > 0 ? 'no-store' : CACHE_CONTROL;
+    return Response.json({ items }, { headers: { 'Cache-Control': cacheControl } });
   } catch (err) {
     logTmdbError(err, { rail: key, providers: providerIds.join(',') });
     return Response.json({ error: 'unavailable' }, { status: 502 });

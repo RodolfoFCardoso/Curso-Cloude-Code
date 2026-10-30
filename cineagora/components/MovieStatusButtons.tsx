@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth, useMovieList } from '@/lib/auth/AuthProvider';
 import type { MovieListError, MovieStatus } from '@/lib/store/types';
 import type { Movie } from '@/lib/tmdb/types';
@@ -22,8 +22,8 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
   // Já montado com esse erro, recarrega (limpa se a sessão voltou); só redireciona na transição.
   // Se a sessão continua expirada, o reload reemite o mesmo erro (sem transição): confere depois dele.
   const previous = useRef<MovieListError | null | undefined>(undefined);
-  const latestError = useRef<MovieListError | null>(null);
   const alive = useRef(true);
+  const [recheck, setRecheck] = useState(0);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -31,18 +31,23 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
     };
   }, []);
   useEffect(() => {
-    latestError.current = error;
     const before = previous.current;
     previous.current = error;
     if (error !== 'unauthenticated' || before === 'unauthenticated') return;
     if (before === undefined) {
+      // reload() nunca rejeita (o store captura os erros); o estado novo é conferido no efeito abaixo.
       void reload().then(() => {
-        if (alive.current && latestError.current === 'unauthenticated') router.push(enterUrl);
+        if (alive.current) setRecheck((n) => n + 1);
       });
     } else {
       router.push(enterUrl);
     }
   }, [error, router, enterUrl, reload]);
+  // Depois do reload, `error` vem do snapshot atual do store (não de um ref que pode estar velho).
+  useEffect(() => {
+    if (recheck > 0 && error === 'unauthenticated') router.push(enterUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só reavalia quando o reload termina
+  }, [recheck]);
 
   if (!available) return null;
 

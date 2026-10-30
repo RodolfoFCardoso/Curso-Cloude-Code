@@ -162,6 +162,26 @@ describe('MovieStatusButtons', () => {
     expect(h.push).not.toHaveBeenCalled();
   });
 
+  it('reload que limpa o erro e resolve antes do commit não redireciona', async () => {
+    const s = controlled(true, 'unauthenticated');
+    const tree = (show: boolean) => (
+      <AuthProvider user={user} available makeStore={() => s.store}>
+        {show && <MovieStatusButtons movie={movie} />}
+      </AuthProvider>
+    );
+    const { rerender } = render(tree(false));
+    await act(async () => {});
+    // notifica e resolve na mesma tarefa, sem flush de efeitos entre os dois
+    s.reload.mockImplementation(() => {
+      s.fail(null);
+      return Promise.resolve();
+    });
+    rerender(tree(true));
+    await act(async () => {});
+    expect(s.reload).toHaveBeenCalledTimes(1);
+    expect(h.push).not.toHaveBeenCalled();
+  });
+
   it('some quando o login está indisponível', async () => {
     const { container } = await setup({ available: false, user: null });
     expect(container).toBeEmptyDOMElement();

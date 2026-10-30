@@ -46,7 +46,7 @@ export type RawProvider = {
   provider_name?: string;
   logo_path?: string | null;
   display_priority?: number;
-  display_priorities?: Record<string, number>;
+  display_priorities?: Partial<Record<string, number>>;
 };
 
 export type RawRegionProviders = {

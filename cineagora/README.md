@@ -70,7 +70,7 @@ logado como A marque um filme e, no **SQL Editor**, rode:
 begin;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"<uuid de B>"}';
-select count(*) from public.movie_status;                       -- esperado: só as linhas de B
+select count(*) from public.movie_status;                       -- esperado: igual ao número de linhas marcadas por B; nunca inclui linhas de A
 update public.movie_status set status = 'watched' where user_id = '<uuid de A>';  -- esperado: 0 linhas
 rollback;
 ```
@@ -82,11 +82,20 @@ teste.
 
 Checklist para validar o fluxo completo no navegador (`npm run dev`):
 
+- [ ] **Pré-condição (antes de qualquer login):** preencher a chave antiga de favoritos no
+      navegador. Pelo DevTools, em **Application > Local Storage**, adicione a chave
+      `cineagora:favorites:v1` com o valor:
+
+      ```json
+      { "movies": [{ "id": 550, "title": "Clube da Luta" }] }
+      ```
+
+      Ou no console da página: `localStorage.setItem('cineagora:favorites:v1', JSON.stringify({ movies: [{ id: 550, title: 'Clube da Luta' }] }))`.
 - [ ] Cadastrar uma conta nova e confirmar pelo e-mail.
+- [ ] Resultado esperado: após o primeiro login, "Clube da Luta" aparece em "Quero assistir" e a
+      chave `cineagora:favorites:v1` some do Local Storage.
 - [ ] Marcar 2 filmes, um em cada status ("Quero assistir" e "Já assisti").
 - [ ] Conferir as contagens nas abas da página de listas.
-- [ ] Migração de favoritos: antes do primeiro login, preencher `cineagora:favorites:v1` no
-      `localStorage` do navegador e confirmar que os favoritos aparecem na conta.
 - [ ] Logout em uma aba reflete na outra aberta.
 - [ ] Trocar a senha pela página da conta.
 - [ ] Recuperar a senha pelo e-mail e definir uma nova.

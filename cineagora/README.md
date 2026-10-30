@@ -61,6 +61,39 @@ Contas e listas ("Quero assistir" / "Já assisti") usam o [Supabase](https://sup
 > **Limite de e-mails:** o SMTP padrão do Supabase envia poucos e-mails por hora. Quem passa do
 > limite vê "Muitas tentativas. Aguarde alguns minutos." Para uso real, configure um SMTP próprio.
 
+### Verificação de RLS
+
+Confirma que um usuário não enxerga nem altera as linhas de outro. Crie dois usuários (A e B),
+logado como A marque um filme e, no **SQL Editor**, rode:
+
+```sql
+begin;
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"<uuid de B>"}';
+select count(*) from public.movie_status;                       -- esperado: só as linhas de B
+update public.movie_status set status = 'watched' where user_id = '<uuid de A>';  -- esperado: 0 linhas
+rollback;
+```
+
+Os UUIDs ficam em **Authentication > Users**. O `rollback` desfaz qualquer alteração feita pelo
+teste.
+
+### Roteiro manual
+
+Checklist para validar o fluxo completo no navegador (`npm run dev`):
+
+- [ ] Cadastrar uma conta nova e confirmar pelo e-mail.
+- [ ] Marcar 2 filmes, um em cada status ("Quero assistir" e "Já assisti").
+- [ ] Conferir as contagens nas abas da página de listas.
+- [ ] Migração de favoritos: antes do primeiro login, preencher `cineagora:favorites:v1` no
+      `localStorage` do navegador e confirmar que os favoritos aparecem na conta.
+- [ ] Logout em uma aba reflete na outra aberta.
+- [ ] Trocar a senha pela página da conta.
+- [ ] Recuperar a senha pelo e-mail e definir uma nova.
+- [ ] Sair da conta.
+
+Anote qualquer desvio do comportamento esperado.
+
 ## Comandos
 
 | Comando          | O que faz                   |

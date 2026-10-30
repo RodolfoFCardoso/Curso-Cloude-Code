@@ -131,9 +131,12 @@ describe('MovieStatusButtons', () => {
     expect(h.push).toHaveBeenCalledTimes(1);
   });
 
-  it('montado com erro unauthenticated recarrega em vez de redirecionar (sem loop)', async () => {
+  async function mountWithStaleError(reloadResult: MovieListError | null) {
     // O AuthProvider (layout) e seu store já existem quando a página é montada ao voltar do login.
     const s = controlled(true, 'unauthenticated');
+    s.reload.mockImplementation(async () => {
+      s.fail(reloadResult);
+    });
     const tree = (show: boolean) => (
       <AuthProvider user={user} available makeStore={() => s.store}>
         {show && <MovieStatusButtons movie={movie} />}
@@ -143,6 +146,18 @@ describe('MovieStatusButtons', () => {
     await act(async () => {});
     rerender(tree(true));
     await act(async () => {});
+    return s;
+  }
+
+  it('montado com erro antigo e sessão ainda expirada: recarrega e redireciona uma vez', async () => {
+    const s = await mountWithStaleError('unauthenticated');
+    expect(s.reload).toHaveBeenCalledTimes(1);
+    expect(h.push).toHaveBeenCalledTimes(1);
+    expect(h.push).toHaveBeenCalledWith('/entrar?voltar=%2Ffilme%2F12');
+  });
+
+  it('montado com erro antigo e sessão válida: recarrega e não redireciona (sem loop)', async () => {
+    const s = await mountWithStaleError(null);
     expect(s.reload).toHaveBeenCalledTimes(1);
     expect(h.push).not.toHaveBeenCalled();
   });

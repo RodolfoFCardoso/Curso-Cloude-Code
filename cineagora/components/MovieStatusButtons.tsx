@@ -20,13 +20,28 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
 
   // O store sobrevive à navegação: ao voltar do login ele ainda guarda 'unauthenticated'.
   // Já montado com esse erro, recarrega (limpa se a sessão voltou); só redireciona na transição.
+  // Se a sessão continua expirada, o reload reemite o mesmo erro (sem transição): confere depois dele.
   const previous = useRef<MovieListError | null | undefined>(undefined);
+  const latestError = useRef<MovieListError | null>(null);
+  const alive = useRef(true);
   useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
+  useEffect(() => {
+    latestError.current = error;
     const before = previous.current;
     previous.current = error;
     if (error !== 'unauthenticated' || before === 'unauthenticated') return;
-    if (before === undefined) void reload();
-    else router.push(enterUrl);
+    if (before === undefined) {
+      void reload().then(() => {
+        if (alive.current && latestError.current === 'unauthenticated') router.push(enterUrl);
+      });
+    } else {
+      router.push(enterUrl);
+    }
   }, [error, router, enterUrl, reload]);
 
   if (!available) return null;

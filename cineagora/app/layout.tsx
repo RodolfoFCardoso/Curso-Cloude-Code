@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist } from 'next/font/google';
+import { Big_Shoulders, Hanken_Grotesk } from 'next/font/google';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { PreferencesProvider } from '@/lib/store/PreferencesProvider';
@@ -11,7 +11,14 @@ import './globals.css';
 // Renderiza por requisição (nunca chama a TMDB no build); os dados ficam no cache do fetch.
 export const dynamic = 'force-dynamic';
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
+const hanken = Hanken_Grotesk({ variable: '--font-hanken', subsets: ['latin'] });
+const shoulders = Big_Shoulders({
+  variable: '--font-shoulders',
+  subsets: ['latin'],
+  axes: ['opsz'],
+  // A tabela de métricas do Next não tem esta fonte; sem isso, só um aviso a cada build.
+  adjustFontFallback: false,
+});
 
 export const metadata: Metadata = {
   title: { default: 'CineAgora', template: '%s · CineAgora' },
@@ -30,8 +37,8 @@ async function loadProviders(): Promise<WatchProvider[] | null> {
 export default async function RootLayout({ children }: LayoutProps<'/'>) {
   const providers = await loadProviders();
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-zinc-950 text-zinc-100">
+    <html lang="pt-BR" className={`${hanken.variable} ${shoulders.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-veludo text-tela">
         <PreferencesProvider>
           <Header providers={providers} />
           <main className="flex-1">{children}</main>

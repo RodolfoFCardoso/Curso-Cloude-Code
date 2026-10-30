@@ -37,6 +37,35 @@ export function runPreferencesStoreContract(name: string, makeStore: () => Prefe
       store.setSelectedProviders([8]);
       expect(store.getSelectedProviders()).toBe(store.getSelectedProviders());
     });
+
+    it('começa sem nota mínima (Todas = 0)', () => {
+      expect(makeStore().getMinRating()).toBe(0);
+    });
+
+    it('salva a nota mínima e notifica', () => {
+      const store = makeStore();
+      const listener = vi.fn();
+      store.subscribe(listener);
+      store.setMinRating(8);
+      expect(store.getMinRating()).toBe(8);
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([5, 7.5, Number.NaN, -1])('nota fora das opções (%s) vira Todas', (value) => {
+      const store = makeStore();
+      store.setMinRating(8);
+      store.setMinRating(value as never);
+      expect(store.getMinRating()).toBe(0);
+    });
+
+    it('mudar a nota não apaga os serviços, e vice-versa', () => {
+      const store = makeStore();
+      store.setSelectedProviders([8]);
+      store.setMinRating(7);
+      store.setSelectedProviders([8, 1899]);
+      expect(store.getMinRating()).toBe(7);
+      expect(store.getSelectedProviders()).toEqual([8, 1899]);
+    });
   });
 }
 

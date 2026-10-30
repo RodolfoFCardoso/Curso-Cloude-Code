@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import type { WatchProvider } from '@/lib/tmdb/types';
 
-const SIZES = { sm: 24, lg: 48 } as const;
+const SIZES = { sm: 24, md: 36, lg: 48 } as const;
 
 export function ProviderBadge({
   provider,
@@ -16,7 +16,7 @@ export function ProviderBadge({
       <span
         title={provider.name}
         style={{ width: px, height: px }}
-        className="inline-flex items-center justify-center rounded-md bg-zinc-700 text-[10px] font-bold text-zinc-100"
+        className="inline-flex items-center justify-center rounded-md bg-cortina text-[10px] font-bold text-tela"
       >
         {provider.name.slice(0, 2).toUpperCase()}
       </span>
@@ -29,7 +29,7 @@ export function ProviderBadge({
       title={provider.name}
       width={px}
       height={px}
-      className="rounded-md ring-1 ring-black/40"
+      className="rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.4)] ring-1 ring-black/30"
     />
   );
 }

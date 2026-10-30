@@ -23,12 +23,14 @@ export default async function SearchPage({ searchParams }: PageProps<'/busca'>) 
   }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className="px-4 pt-24 pb-6 sm:px-10 sm:pt-32">
       <div className="mb-6 sm:hidden">
         <SearchBar defaultValue={q} />
       </div>
-      <div className="mb-6 hidden sm:block">
-        <h1 className="text-2xl font-bold">{q ? `Resultados para "${q}"` : 'Buscar filmes'}</h1>
+      <div className="mb-10 hidden sm:block">
+        <h1 className="font-display text-[clamp(2.5rem,5vw,4rem)] leading-[0.9] font-black text-balance text-tela">
+          {q ? `Resultados para "${q}"` : 'Buscar filmes'}
+        </h1>
       </div>
 
       {!q ? (
@@ -38,7 +40,7 @@ export default async function SearchPage({ searchParams }: PageProps<'/busca'>) 
       ) : movies.length === 0 ? (
         <EmptyState title={`Nenhum filme encontrado para "${q}". Tente outro termo.`} />
       ) : (
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
           {movies.map((m) => (
             <li key={m.id}>
               <MovieCard movie={m} fluid />

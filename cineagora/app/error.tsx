@@ -10,18 +10,20 @@ export default function HomeError({
   reset?: () => void;
 }) {
   return (
-    <EmptyState
-      title="Não foi possível carregar os filmes agora."
-      message="Pode ser uma instabilidade passageira. Tente de novo em instantes."
-      action={
-        <button
-          type="button"
-          onClick={() => retry()}
-          className="rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-300"
-        >
-          Tentar novamente
-        </button>
-      }
-    />
+    <div className="pt-20">
+      <EmptyState
+        title="Não foi possível carregar os filmes agora."
+        message="Pode ser uma instabilidade passageira. Tente de novo em instantes."
+        action={
+          <button
+            type="button"
+            onClick={() => retry()}
+            className="rounded-full bg-projetor px-5 py-2.5 text-sm font-semibold text-veludo transition-colors hover:bg-projetor-forte"
+          >
+            Tentar novamente
+          </button>
+        }
+      />
+    </div>
   );
 }

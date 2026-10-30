@@ -84,14 +84,14 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
-        className="shrink-0 rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-300"
+        className="flex shrink-0 items-center gap-2 rounded-full bg-projetor px-3.5 py-2 text-sm sm:px-4 font-semibold text-veludo transition-colors hover:bg-projetor-forte"
       >
         {chosen.size > 0 ? `Meus streamings (${chosen.size})` : 'Meus streamings'}
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex justify-end bg-black/60"
+          className="fixed inset-0 z-50 flex justify-end bg-veludo/70 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
           <div
@@ -101,19 +101,21 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
             aria-modal="true"
             aria-label="Meus streamings"
             onClick={(e) => e.stopPropagation()}
-            className="flex h-full w-full max-w-sm flex-col gap-4 bg-zinc-900 p-5 shadow-2xl"
+            className="flex h-full w-full max-w-sm flex-col gap-4 bg-poltrona p-6 shadow-[-24px_0_60px_rgba(0,0,0,0.5)] ring-1 ring-cortina"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-zinc-100">Meus streamings</h2>
+              <h2 className="font-display text-3xl leading-none font-extrabold text-tela">
+                Meus streamings
+              </h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="text-sm text-zinc-400 hover:text-zinc-100"
+                className="rounded-full px-3 py-1 text-sm text-penumbra hover:bg-cortina hover:text-tela"
               >
                 Fechar
               </button>
             </div>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm leading-relaxed text-penumbra">
               Marque os serviços que você assina. A home passa a mostrar só o que você já pode ver.
             </p>
 
@@ -127,22 +129,22 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
                   placeholder="Buscar serviço…"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-100 outline-none ring-1 ring-white/10 focus:ring-amber-400"
+                  className="rounded-lg bg-veludo px-3 py-2.5 text-sm text-tela ring-1 ring-cortina outline-none placeholder:text-penumbra focus:ring-projetor focus-visible:outline-none"
                 />
                 <ul className="-mx-2 flex-1 overflow-y-auto">
                   {visible.map((p) => (
                     <li key={p.id}>
-                      <label className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-zinc-800">
+                      <label className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-cortina/60 has-[:checked]:bg-cortina">
                         <input
                           type="checkbox"
                           checked={chosen.has(p.id)}
                           onChange={() => toggle(p.id)}
-                          className="h-4 w-4 accent-amber-400"
+                          className="h-4 w-4 accent-projetor"
                         />
                         <span aria-hidden="true">
                           <ProviderBadge provider={p} />
                         </span>
-                        <span className="text-sm text-zinc-100">{p.name}</span>
+                        <span className="text-sm text-tela">{p.name}</span>
                       </label>
                     </li>
                   ))}
@@ -154,7 +156,7 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
               type="button"
               onClick={() => setSelected([])}
               disabled={chosen.size === 0}
-              className="rounded-md px-3 py-2 text-sm text-zinc-300 ring-1 ring-white/10 hover:bg-zinc-800 disabled:opacity-40"
+              className="rounded-full px-3 py-2.5 text-sm text-tela ring-1 ring-cortina hover:bg-cortina disabled:opacity-40 disabled:hover:bg-transparent"
             >
               Limpar
             </button>

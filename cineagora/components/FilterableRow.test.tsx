@@ -8,11 +8,11 @@ import type { Movie, RailItem } from '@/lib/tmdb/types';
 import { FilterableRow } from './FilterableRow';
 import { RailStatusProvider, useRailRetry, useRailStatuses } from './RailStatus';
 
-const movie = (id: number): Movie => ({
+const movie = (id: number, rating: number | null = null): Movie => ({
   id,
   title: `Filme ${id}`,
   year: null,
-  rating: null,
+  rating,
   posterUrl: null,
   backdropUrl: null,
   genreIds: [],
@@ -37,15 +37,11 @@ function StatusProbe() {
   );
 }
 
-function setup(store: PreferencesStore) {
+function setup(store: PreferencesStore, initialMovies = [movie(1), movie(2), movie(3)]) {
   return render(
     <PreferencesProvider store={store}>
       <RailStatusProvider total={1}>
-        <FilterableRow
-          railKey="popular"
-          title="Populares"
-          initialMovies={[movie(1), movie(2), movie(3)]}
-        />
+        <FilterableRow railKey="popular" title="Populares" initialMovies={initialMovies} />
         <StatusProbe />
       </RailStatusProvider>
     </PreferencesProvider>,
@@ -162,5 +158,48 @@ describe('FilterableRow', () => {
     await screen.findByText('empty');
     act(() => store.setSelectedProviders([]));
     expect(screen.getAllByRole('link')).toHaveLength(3);
+  });
+
+  it('nota mínima sem streamings filtra os iniciais sem chamar a API', () => {
+    const store = createLocalPreferencesStore(null);
+    store.setMinRating(8);
+    setup(store, [movie(1, 8.2), movie(2, 6.5), movie(3, null)]);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByTestId('status')).toHaveTextContent('shown');
+  });
+
+  it('nota mínima que esvazia o trilho esconde e reporta empty', () => {
+    const store = createLocalPreferencesStore(null);
+    store.setMinRating(8);
+    setup(store, [movie(1, 6)]);
+    expect(screen.queryByRole('region', { name: 'Populares' })).not.toBeInTheDocument();
+    expect(screen.getByTestId('status')).toHaveTextContent('empty');
+  });
+
+  it('nota mínima também vale sobre o resultado dos streamings', async () => {
+    const store = filtered([8]);
+    store.setMinRating(7);
+    fetchMock.mockResolvedValue(
+      ok([
+        { movie: movie(1, 7.4), badges: [netflix] },
+        { movie: movie(2, 5), badges: [netflix] },
+      ]),
+    );
+    setup(store);
+    expect(await screen.findByText('shown')).toBeInTheDocument();
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
+
+  it('trocar a nota não refaz a busca dos streamings', async () => {
+    const store = filtered([8]);
+    fetchMock.mockResolvedValue(ok([{ movie: movie(1, 6), badges: [netflix] }]));
+    setup(store);
+    await screen.findByText('shown');
+    act(() => store.setMinRating(8));
+    expect(screen.getByTestId('status')).toHaveTextContent('empty');
+    act(() => store.setMinRating(0));
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

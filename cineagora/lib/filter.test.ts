@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { filterRail, matchesProviders, matchingProviders } from './filter';
+import { filterByRating, filterRail, matchesProviders, matchingProviders } from './filter';
 import { EMPTY_PROVIDERS } from './tmdb/providers-mapper';
 import type { Movie, WatchProvider, WatchProviders } from './tmdb/types';
 
@@ -33,6 +33,23 @@ describe('matchesProviders / matchingProviders', () => {
   it('badges sem duplicatas', () => {
     const p = providers({ subscription: [netflix, max], free: [netflix] });
     expect(matchingProviders(p, [8, 1899])).toEqual([netflix, max]);
+  });
+});
+
+describe('filterByRating', () => {
+  const rated = (id: number, rating: number | null) => ({
+    movie: { ...movie(id), rating },
+    badges: [],
+  });
+
+  it('Todas (0) devolve a mesma lista, inclusive sem nota', () => {
+    const items = [rated(1, null), rated(2, 5)];
+    expect(filterByRating(items, 0)).toBe(items);
+  });
+
+  it('mantém notas iguais ou acima do mínimo e tira as sem nota', () => {
+    const items = [rated(1, 8), rated(2, 7.9), rated(3, 9.1), rated(4, null)];
+    expect(filterByRating(items, 8).map((i) => i.movie.id)).toEqual([1, 3]);
   });
 });
 

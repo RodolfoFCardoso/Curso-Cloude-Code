@@ -1,19 +1,92 @@
 @import 'tailwindcss';
 
+/* Sala escura: veludo das poltronas, luz do projetor, a tela. */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-display: var(--font-shoulders), 'Arial Narrow', sans-serif;
+
+  --color-veludo: #170b10;
+  --color-poltrona: #24131a;
+  --color-cortina: #3d1f2a;
+  --color-projetor: #ffc857;
+  --color-projetor-forte: #ffd884;
+  --color-tela: #f6efe7;
+  --color-penumbra: #b29ea5;
 }
 
 html {
   color-scheme: dark;
+  background: var(--color-veludo);
 }
 
 body {
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
-/* Trilhos: rolagem horizontal discreta */
-.overflow-x-auto {
-  scrollbar-width: thin;
-  scrollbar-color: #3f3f46 transparent;
+::selection {
+  background: var(--color-projetor);
+  color: var(--color-veludo);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-projetor);
+  outline-offset: 3px;
+}
+
+/* Títulos de letreiro: Big Shoulders no tamanho óptico máximo. */
+.font-display {
+  font-variation-settings: 'opsz' 72;
+}
+
+/* Trilhos: rolagem horizontal sem barra visível (há setas e rolagem por toque). */
+.trilho {
+  scrollbar-width: none;
+}
+.trilho::-webkit-scrollbar {
+  display: none;
+}
+
+/* O único momento orquestrado: o projetor acende sobre o filme em destaque. */
+@keyframes projetor-acende {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+    filter: brightness(0.2) saturate(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1) saturate(1);
+  }
+}
+@keyframes letreiro-entra {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.projetor-acende {
+  animation: projetor-acende 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.letreiro-entra {
+  animation: letreiro-entra 0.9s 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Trocar de filme no destaque: transição curta, em resposta ao clique. */
+.troca-destaque {
+  animation: projetor-acende 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projetor-acende,
+  .letreiro-entra,
+  .troca-destaque {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
 }

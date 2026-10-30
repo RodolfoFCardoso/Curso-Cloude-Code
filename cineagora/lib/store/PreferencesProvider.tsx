@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useSyncExternalStore, type ReactNo
 import type { Movie } from '../tmdb/types';
 import { createLocalFavoritesStore } from './local-favorites';
 import { createLocalPreferencesStore } from './local-preferences';
-import type { FavoritesStore, PreferencesStore } from './types';
+import type { FavoritesStore, MinRating, PreferencesStore } from './types';
 
 type Stores = { preferences: PreferencesStore; favorites: FavoritesStore };
 
@@ -54,6 +54,20 @@ export function usePreferences(): {
     serverSnapshot,
   );
   return { selected, setSelected: preferences.setSelectedProviders };
+}
+
+/** `minRating === null` enquanto não hidratou; 0 = Todas. */
+export function useMinRating(): {
+  minRating: MinRating | null;
+  setMinRating(value: MinRating): void;
+} {
+  const { preferences } = useStores();
+  const minRating = useSyncExternalStore(
+    preferences.subscribe,
+    preferences.getMinRating,
+    serverSnapshot,
+  );
+  return { minRating, setMinRating: preferences.setMinRating };
 }
 
 /** `favorites === null` enquanto não hidratou. */

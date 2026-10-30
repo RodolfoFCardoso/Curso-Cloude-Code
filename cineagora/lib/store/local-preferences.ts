@@ -1,17 +1,29 @@
-import type { PreferencesStore } from './types';
+import { MIN_RATINGS, type MinRating, type PreferencesStore } from './types';
 
 export function normalizeIds(ids: unknown[]): number[] {
   const valid = ids.filter((id): id is number => Number.isInteger(id) && (id as number) > 0);
   return [...new Set(valid)].sort((a, b) => a - b);
 }
 
-function readIds(storage: Storage | null, key: string): number[] {
+export function normalizeMinRating(value: unknown): MinRating {
+  return MIN_RATINGS.find((r) => r === value) ?? 0;
+}
+
+type Saved = { selectedProviders: number[]; minRating: MinRating };
+
+function read(storage: Storage | null, key: string): Saved {
   try {
-    const parsed: unknown = JSON.parse(storage?.getItem(key) ?? 'null');
-    const ids = (parsed as { selectedProviders?: unknown } | null)?.selectedProviders;
-    return Array.isArray(ids) ? normalizeIds(ids) : [];
+    const parsed = JSON.parse(storage?.getItem(key) ?? 'null') as {
+      selectedProviders?: unknown;
+      minRating?: unknown;
+    } | null;
+    const ids = parsed?.selectedProviders;
+    return {
+      selectedProviders: Array.isArray(ids) ? normalizeIds(ids) : [],
+      minRating: normalizeMinRating(parsed?.minRating),
+    };
   } catch {
-    return [];
+    return { selectedProviders: [], minRating: 0 };
   }
 }
 
@@ -19,19 +31,27 @@ export function createLocalPreferencesStore(
   storage: Storage | null = null,
   key = 'cineagora:prefs:v1',
 ): PreferencesStore {
-  let selected = readIds(storage, key);
+  let saved = read(storage, key);
   const listeners = new Set<() => void>();
 
+  function save(next: Saved) {
+    saved = next;
+    try {
+      storage?.setItem(key, JSON.stringify(saved));
+    } catch {
+      // Modo privado / cota cheia: segue só em memória.
+    }
+    listeners.forEach((listener) => listener());
+  }
+
   return {
-    getSelectedProviders: () => selected,
+    getSelectedProviders: () => saved.selectedProviders,
     setSelectedProviders(ids) {
-      selected = normalizeIds(ids);
-      try {
-        storage?.setItem(key, JSON.stringify({ selectedProviders: selected }));
-      } catch {
-        // Modo privado / cota cheia: segue só em memória.
-      }
-      listeners.forEach((listener) => listener());
+      save({ ...saved, selectedProviders: normalizeIds(ids) });
+    },
+    getMinRating: () => saved.minRating,
+    setMinRating(value) {
+      save({ ...saved, minRating: normalizeMinRating(value) });
     },
     subscribe(listener) {
       listeners.add(listener);

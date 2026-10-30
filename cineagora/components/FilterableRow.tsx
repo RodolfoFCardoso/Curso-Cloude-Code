@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { filterByRating } from '@/lib/filter';
 import type { RailKey } from '@/lib/rails';
-import { usePreferences } from '@/lib/store/PreferencesProvider';
+import { useMinRating, usePreferences } from '@/lib/store/PreferencesProvider';
 import type { Movie, RailItem } from '@/lib/tmdb/types';
 import { RailSkeleton } from './RailSkeleton';
 import { useRailAttempt, useReportRailStatus, type RailState } from './RailStatus';
@@ -25,6 +26,7 @@ export function FilterableRow({
   initialMovies: Movie[];
 }) {
   const { selected } = usePreferences();
+  const { minRating } = useMinRating();
   const query = selected?.length ? selected.join(',') : '';
   const [filtered, setFiltered] = useState<Filtered | null>(null);
   const attempt = useRailAttempt();
@@ -49,16 +51,25 @@ export function FilterableRow({
 
   // Resultado de um filtro (ou tentativa) anterior não vale para o atual.
   const current = filtered?.query === query && filtered.attempt === attempt ? filtered : null;
-  const hydrated = selected !== null;
-  const state: RailState = !hydrated ? 'loading' : !query ? 'shown' : (current?.state ?? 'loading');
+  const hydrated = selected !== null && minRating !== null;
+  const fetched: RailState = !hydrated
+    ? 'loading'
+    : !query
+      ? 'shown'
+      : (current?.state ?? 'loading');
+  // A nota mínima é aplicada aqui, no cliente: trocar de chip não refaz a busca.
+  const items =
+    fetched !== 'shown'
+      ? []
+      : filterByRating(
+          query ? current!.items : initialMovies.map((movie) => ({ movie, badges: [] })),
+          minRating ?? 0,
+        );
+  const state: RailState = fetched === 'shown' && items.length === 0 ? 'empty' : fetched;
   useReportRailStatus(railKey, state);
 
   // Até ler o filtro salvo, não mostra filmes que talvez fiquem de fora (evita "pulo").
-  if (!hydrated) return <RailSkeleton title={title} />;
-  if (!query) {
-    return <Row title={title} items={initialMovies.map((movie) => ({ movie, badges: [] }))} />;
-  }
   if (state === 'loading') return <RailSkeleton title={title} />;
   if (state !== 'shown') return null;
-  return <Row title={title} items={current!.items} />;
+  return <Row title={title} items={items} />;
 }

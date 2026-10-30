@@ -15,6 +15,12 @@ export function matchesProviders(p: WatchProviders, selected: number[]): boolean
   return selected.length === 0 || matchingProviders(p, selected).length > 0;
 }
 
+/** Nota mínima (TMDB): 0 devolve a lista como veio; filmes sem nota saem quando há mínimo. */
+export function filterByRating(items: RailItem[], minRating: number): RailItem[] {
+  if (minRating <= 0) return items;
+  return items.filter(({ movie }) => movie.rating != null && movie.rating >= minRating);
+}
+
 /** `failures` > 0 indica resultado parcial (alguma consulta falhou) — não deve ir para cache. */
 export type FilterResult = { items: RailItem[]; failures: number };
 

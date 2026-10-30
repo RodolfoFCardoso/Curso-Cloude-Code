@@ -11,13 +11,15 @@ export function FavoriteButton({ movie }: { movie: Movie }) {
       type="button"
       aria-pressed={active}
       onClick={() => toggle(movie)}
-      className={`self-start rounded-full px-4 py-2 text-sm font-semibold ring-1 transition ${
+      className={`inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold ring-1 backdrop-blur-md transition-colors ${
         active
-          ? 'bg-amber-400 text-zinc-950 ring-amber-400 hover:bg-amber-300'
-          : 'text-zinc-100 ring-white/20 hover:bg-zinc-800'
+          ? 'bg-tela text-veludo ring-tela hover:bg-tela/85'
+          : 'bg-tela/10 text-tela ring-tela/30 hover:bg-tela/20'
       }`}
     >
-      <span aria-hidden="true">{active ? '✓ ' : '+ '}</span>
+      <span aria-hidden="true" className="text-base leading-none">
+        {active ? '✓' : '+'}
+      </span>
       {active ? 'Remover da minha lista' : 'Adicionar à minha lista'}
     </button>
   );

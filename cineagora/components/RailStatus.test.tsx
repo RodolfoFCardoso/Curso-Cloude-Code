@@ -21,9 +21,10 @@ function AttemptProbe() {
   return <output data-testid="attempt">{useRailAttempt()}</output>;
 }
 
-function setup(states: RailState[], selected: number[] = [8]) {
+function setup(states: RailState[], selected: number[] = [8], minRating: 0 | 6 | 7 | 8 = 0) {
   const store = createLocalPreferencesStore(null);
   store.setSelectedProviders(selected);
+  store.setMinRating(minRating);
   render(
     <PreferencesProvider store={store}>
       <RailStatusProvider total={states.length}>
@@ -79,4 +80,46 @@ describe('FilteredEmptyNotice', () => {
     expect(listener).toHaveBeenCalledOnce();
     window.removeEventListener(OPEN_PROVIDER_FILTER_EVENT, listener);
   });
+
+  describe('só com nota mínima', () => {
+    const RATING_MESSAGE = 'Nenhum filme com nota 8+ nestes trilhos';
+
+    it('todos vazios: mostra a mensagem da nota e o botão volta para Todas', async () => {
+      const store = setupRating(['empty', 'empty']);
+      expect(screen.getByRole('heading', { name: RATING_MESSAGE })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Ajustar meus streamings' }),
+      ).not.toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: 'Mostrar todas as notas' }));
+      expect(store.getMinRating()).toBe(0);
+    });
+
+    it('não aparece se algum trilho tem filmes', () => {
+      setupRating(['empty', 'shown']);
+      expect(screen.queryByText(RATING_MESSAGE)).not.toBeInTheDocument();
+    });
+  });
+
+  it('streamings e nota juntos: mensagem dos streamings e os dois botões', () => {
+    setup(['empty'], [8], 8);
+    expect(screen.getByRole('heading', { name: MESSAGE })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ajustar meus streamings' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mostrar todas as notas' })).toBeInTheDocument();
+  });
 });
+
+function setupRating(states: RailState[]) {
+  const store = createLocalPreferencesStore(null);
+  store.setMinRating(8);
+  render(
+    <PreferencesProvider store={store}>
+      <RailStatusProvider total={states.length}>
+        {states.map((s, i) => (
+          <Reporter key={i} id={`r${i}`} state={s} />
+        ))}
+        <FilteredEmptyNotice />
+      </RailStatusProvider>
+    </PreferencesProvider>,
+  );
+  return store;
+}

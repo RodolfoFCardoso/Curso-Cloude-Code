@@ -18,6 +18,24 @@ export interface PreferencesStore {
   subscribe(listener: () => void): () => void;
 }
 
+export type MovieStatus = 'want' | 'watched';
+
+export type MovieListError = 'load' | 'save' | 'unauthenticated';
+
+export interface MovieListStore {
+  /** false até a primeira carga terminar. */
+  isReady(): boolean;
+  /** Mais recente primeiro; mesma referência enquanto não mudar. */
+  list(status: MovieStatus): Movie[];
+  statusOf(id: number): MovieStatus | null;
+  /** null = desmarcar. Otimista: atualiza na hora, desfaz se o banco falhar. */
+  setStatus(movie: Movie, status: MovieStatus | null): void;
+  /** Último erro; null depois de uma operação bem-sucedida. */
+  lastError(): MovieListError | null;
+  reload(): Promise<void>;
+  subscribe(listener: () => void): () => void;
+}
+
 export interface FavoritesStore {
   /** Mais recente primeiro; mesma referência enquanto não mudar. */
   list(): Movie[];

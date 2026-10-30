@@ -11,6 +11,7 @@ const h = vi.hoisted(() => ({
   authCb: null as null | ((e: string, s: { user?: { id: string } } | null) => void),
   migrate: vi.fn(),
   reload: vi.fn(),
+  getSession: vi.fn(),
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 vi.mock('@/lib/store/migrate-favorites', () => ({ migrateLocalFavorites: h.migrate }));
@@ -33,6 +34,7 @@ vi.mock('@/lib/supabase/browser', () => ({
         h.authCb = cb;
         return { data: { subscription: { unsubscribe: h.unsubscribe } } };
       },
+      getSession: h.getSession,
     },
   }),
 }));
@@ -138,6 +140,8 @@ describe('AuthProvider', () => {
   });
 
   it('onAuthStateChange: refresh só se o id difere; desassina ao desmontar', () => {
+    // O browser client emite SIGNED_IN ao ler a sessão (ex.: login em outra aba); o Sair é
+    // server action e não emite SIGNED_OUT aqui, por isso o foco/visibilidade é testado abaixo.
     const { unmount } = render(
       <AuthProvider
         user={{ id: 'u1', email: 'a@b.c' }}
@@ -149,11 +153,69 @@ describe('AuthProvider', () => {
     );
     h.authCb!('SIGNED_IN', { user: { id: 'u1' } });
     expect(h.refresh).not.toHaveBeenCalled();
-    h.authCb!('SIGNED_OUT', null);
-    expect(h.refresh).toHaveBeenCalledTimes(1);
     h.authCb!('SIGNED_IN', { user: { id: 'u2' } });
-    expect(h.refresh).toHaveBeenCalledTimes(2);
+    expect(h.refresh).toHaveBeenCalledTimes(1);
     unmount();
     expect(h.unsubscribe).toHaveBeenCalled();
+  });
+
+  function renderLoggedIn() {
+    return render(
+      <AuthProvider
+        user={{ id: 'u1', email: 'a@b.c' }}
+        available
+        makeStore={() => createMemoryMovieListStore()}
+      >
+        <Probe />
+      </AuthProvider>,
+    );
+  }
+
+  it('logout em outra aba: ao voltar o foco sem sessão, faz refresh', async () => {
+    h.getSession.mockResolvedValue({ data: { session: null }, error: null });
+    renderLoggedIn();
+    await act(async () => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    expect(h.getSession).toHaveBeenCalled();
+    expect(h.refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('aba volta a ficar visível com a mesma sessão: não faz refresh', async () => {
+    h.getSession.mockResolvedValue({ data: { session: { user: { id: 'u1' } } }, error: null });
+    renderLoggedIn();
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(h.getSession).toHaveBeenCalled();
+    expect(h.refresh).not.toHaveBeenCalled();
+  });
+
+  it('visibilitychange para oculta não consulta a sessão; desmontar remove os listeners', async () => {
+    h.getSession.mockResolvedValue({ data: { session: null }, error: null });
+    const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    const { unmount } = renderLoggedIn();
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(h.getSession).not.toHaveBeenCalled();
+    visibility.mockRestore();
+    unmount();
+    await act(async () => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    expect(h.getSession).not.toHaveBeenCalled();
+  });
+
+  it('login indisponível não escuta foco', async () => {
+    render(
+      <AuthProvider user={null} available={false}>
+        <Probe />
+      </AuthProvider>,
+    );
+    await act(async () => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    expect(h.getSession).not.toHaveBeenCalled();
   });
 });

@@ -81,6 +81,31 @@ export function AuthProvider({
     return () => data.subscription.unsubscribe();
   }, [available, userId, router]);
 
+  // O Sair é server action: o browser client nunca emite SIGNED_OUT, e ao voltar o foco sem
+  // sessão também não há evento. Ao reativar a aba, compara a sessão dos cookies com o usuário atual.
+  useEffect(() => {
+    if (!available) return;
+    let active = true;
+    const check = () => {
+      void getSupabaseBrowserClient()
+        .auth.getSession()
+        .then(({ data }) => {
+          if (active && (data.session?.user.id ?? null) !== userId) router.refresh();
+        })
+        .catch(() => {});
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') check();
+    };
+    window.addEventListener('focus', check);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      active = false;
+      window.removeEventListener('focus', check);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [available, userId, router]);
+
   const value = useMemo(() => ({ user, available, store }), [user, available, store]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

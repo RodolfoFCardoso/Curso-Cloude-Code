@@ -48,8 +48,21 @@ export function movieStatusTable(client: SupabaseClient, userId: string): MovieS
       return { data: null, error: error && { message: error.message, code: error.code, status } };
     },
     async remove(movieId) {
-      const { error, status } = await from().delete().eq('user_id', userId).eq('movie_id', movieId);
-      return { data: null, error: error && { message: error.message, code: error.code, status } };
+      const { data, error, status } = await from()
+        .delete()
+        .eq('user_id', userId)
+        .eq('movie_id', movieId)
+        .select('movie_id');
+      if (error) return { data: null, error: { message: error.message, code: error.code, status } };
+      // Sem sessão (ex.: Sair em outra aba), o DELETE vai como anônimo e a RLS filtra tudo:
+      // 0 linhas, sem erro. Com sessão, 0 linhas só quer dizer que o filme já não estava lá.
+      if (!data?.length) {
+        const { data: auth } = await client.auth.getSession();
+        if (!auth.session) {
+          return { data: null, error: { message: 'Sessão ausente ao remover', status: 401 } };
+        }
+      }
+      return { data: null, error: null };
     },
   };
 }

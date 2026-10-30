@@ -2,7 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Movie } from '../tmdb/types';
 import { runMovieListStoreContract } from './contract';
 import { createFakeMovieStatusTable } from './fake-movie-status-table';
-import { createSupabaseMovieListStore, fromRow, toRow } from './supabase-movie-list';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import {
+  createSupabaseMovieListStore,
+  fromRow,
+  movieStatusTable,
+  toRow,
+} from './supabase-movie-list';
 
 const movie = (id: number): Movie => ({
   id,
@@ -233,5 +239,58 @@ describe('createSupabaseMovieListStore', () => {
     await vi.waitFor(() => expect(s.lastError()).toBe('save'));
     expect(s.statusOf(1)).toBeNull();
     expect(s.statusOf(2)).toBe('want');
+  });
+});
+
+describe('movieStatusTable.remove', () => {
+  // Cliente mínimo: delete().eq().eq().select() devolve o resultado configurado.
+  function client(result: { data: unknown; error: unknown; status: number }, session: unknown) {
+    const calls: string[] = [];
+    const chain = {
+      delete: () => (calls.push('delete'), chain),
+      eq: (col: string, val: unknown) => (calls.push(`eq:${col}=${val}`), chain),
+      select: (cols: string) => (calls.push(`select:${cols}`), Promise.resolve(result)),
+    };
+    const c = {
+      from: (name: string) => (calls.push(`from:${name}`), chain),
+      auth: { getSession: async () => ({ data: { session }, error: null }) },
+    };
+    return { c: c as unknown as SupabaseClient, calls };
+  }
+
+  it('apagou a linha: sem erro, pedindo as linhas apagadas de volta', async () => {
+    const { c, calls } = client({ data: [{ movie_id: 7 }], error: null, status: 200 }, { user: {} });
+    await expect(movieStatusTable(c, 'u1').remove(7)).resolves.toEqual({ data: null, error: null });
+    expect(calls).toEqual(['from:movie_status', 'delete', 'eq:user_id=u1', 'eq:movie_id=7', 'select:movie_id']);
+  });
+
+  it('0 linhas sem sessão (logout em outra aba, RLS filtra tudo) → erro 401', async () => {
+    const { c } = client({ data: [], error: null, status: 200 }, null);
+    const result = await movieStatusTable(c, 'u1').remove(7);
+    expect(result.error?.status).toBe(401);
+  });
+
+  it('0 linhas com sessão (já removido em outra aba) → sem erro', async () => {
+    const { c } = client({ data: [], error: null, status: 200 }, { user: { id: 'u1' } });
+    await expect(movieStatusTable(c, 'u1').remove(7)).resolves.toEqual({ data: null, error: null });
+  });
+
+  it('erro do banco é repassado com o status', async () => {
+    const { c } = client({ data: null, error: { message: 'jwt', code: 'PGRST301' }, status: 401 }, null);
+    await expect(movieStatusTable(c, 'u1').remove(7)).resolves.toEqual({
+      data: null,
+      error: { message: 'jwt', code: 'PGRST301', status: 401 },
+    });
+  });
+
+  it('o store traduz o 401 do remove em unauthenticated e desfaz', async () => {
+    const { c } = client({ data: [], error: null, status: 200 }, null);
+    const real = movieStatusTable(c, 'u1');
+    const t = createFakeMovieStatusTable([toRow(movie(7), 'want')]);
+    const s = createSupabaseMovieListStore({ ...t, remove: real.remove });
+    await s.reload();
+    s.setStatus(movie(7), null);
+    await vi.waitFor(() => expect(s.lastError()).toBe('unauthenticated'));
+    expect(s.statusOf(7)).toBe('want');
   });
 });

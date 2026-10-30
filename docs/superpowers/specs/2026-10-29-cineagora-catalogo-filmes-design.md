@@ -1,7 +1,7 @@
 # CineAgora — Catálogo de filmes nos streamings (Design)
 
 - **Data:** 2026-10-29
-- **Status:** Design aprovado (aguardando revisão da spec)
+- **Status:** Aprovado (spec revisada em 2026-10-30)
 - **Autor:** Rodolfo + Claude (brainstorming)
 - **Nome do produto:** CineAgora (placeholder, sujeito a mudança)
 

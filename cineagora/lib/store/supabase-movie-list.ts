@@ -34,7 +34,10 @@ export function movieStatusTable(client: SupabaseClient, userId: string): MovieS
         .select('*')
         .eq('user_id', userId)
         .order('updated_at', { ascending: false });
-      return { data: data as MovieStatusRow[] | null, error: error && { ...error, status } };
+      return {
+        data: data as MovieStatusRow[] | null,
+        error: error && { message: error.message, code: error.code, status },
+      };
     },
     async upsert(rows, opts) {
       const updatedAt = new Date().toISOString();
@@ -42,11 +45,11 @@ export function movieStatusTable(client: SupabaseClient, userId: string): MovieS
         rows.map((r) => ({ ...r, user_id: userId, updated_at: updatedAt })),
         { onConflict: 'user_id,movie_id', ignoreDuplicates: opts?.ignoreDuplicates ?? false },
       );
-      return { data: null, error: error && { ...error, status } };
+      return { data: null, error: error && { message: error.message, code: error.code, status } };
     },
     async remove(movieId) {
       const { error, status } = await from().delete().eq('user_id', userId).eq('movie_id', movieId);
-      return { data: null, error: error && { ...error, status } };
+      return { data: null, error: error && { message: error.message, code: error.code, status } };
     },
   };
 }
@@ -120,13 +123,34 @@ export function createSupabaseMovieListStore(table: MovieStatusTable): MovieList
     }
   }
 
+  // Último estado confirmado pelo servidor (snapshot aplicado ou escrita bem-sucedida), mais recente primeiro.
+  let confirmed: Entry[] = [];
+  // Estado otimista mais recente dos filmes com escrita em andamento (null = desmarcado).
+  const optimistic = new Map<number, Entry | null>();
+  let reloadGeneration = 0;
+  let writeSeq = 0;
+  let lastFailedSeq = 0;
+
+  const confirm = (id: number, entry: Entry | null) => {
+    confirmed = confirmed.filter((e) => e.movie.id !== id);
+    if (entry) confirmed = [entry, ...confirmed];
+  };
+
   async function reload() {
+    const generation = ++reloadGeneration;
     const result = await run(() => table.selectAll());
+    if (generation !== reloadGeneration) return; // uma recarga mais nova assumiu
     if (result.error) {
       report('load', result.error);
       error = classify(result.error, 'load');
     } else {
-      entries = ((result.data as MovieStatusRow[] | null) ?? []).map(fromRow);
+      confirmed = ((result.data as MovieStatusRow[] | null) ?? []).map(fromRow);
+      entries = [...confirmed];
+      // Escritas ainda pendentes prevalecem sobre o snapshot.
+      for (const [id, entry] of optimistic) {
+        entries = entries.filter((e) => e.movie.id !== id);
+        if (entry) entries = [entry, ...entries];
+      }
       recompute(...STATUSES);
       error = null;
     }
@@ -135,30 +159,40 @@ export function createSupabaseMovieListStore(table: MovieStatusTable): MovieList
   }
 
   function setStatus(movie: Movie, status: MovieStatus | null) {
-    const index = indexOf(movie.id);
-    const previous = entries[index] ?? null;
+    const previous = entries[indexOf(movie.id)] ?? null;
     if ((previous?.status ?? null) === status) return;
 
     const version = (versions.get(movie.id) ?? 0) + 1;
     versions.set(movie.id, version);
+    const seq = ++writeSeq;
+    const next: Entry | null = status === null ? null : { movie, status };
     entries = entries.filter((e) => e.movie.id !== movie.id);
-    if (status !== null) entries = [{ movie, status }, ...entries];
+    if (next) entries = [next, ...entries];
+    optimistic.set(movie.id, next);
     recompute(previous?.status ?? null, status);
     notify();
 
     const write = status === null ? () => table.remove(movie.id) : () => table.upsert([toRow(movie, status)]);
     void run(write).then((result) => {
+      const latest = versions.get(movie.id) === version;
       if (!result.error) {
-        if (error !== null) {
+        confirm(movie.id, next);
+        if (latest) optimistic.delete(movie.id);
+        // Só limpa o erro se nenhuma escrita iniciada depois desta falhou.
+        if (error !== null && lastFailedSeq < seq) {
           error = null;
           notify();
         }
         return;
       }
       report('save', result.error);
-      if (versions.get(movie.id) === version) {
+      lastFailedSeq = Math.max(lastFailedSeq, seq);
+      if (latest) {
+        optimistic.delete(movie.id);
+        // Volta ao último estado confirmado pelo servidor, na posição confirmada.
+        const at = confirmed.findIndex((e) => e.movie.id === movie.id);
         entries = entries.filter((e) => e.movie.id !== movie.id);
-        if (previous) entries.splice(Math.min(index, entries.length), 0, previous);
+        if (at >= 0) entries.splice(Math.min(at, entries.length), 0, confirmed[at]);
         recompute(...STATUSES);
       }
       error = classify(result.error, 'save');

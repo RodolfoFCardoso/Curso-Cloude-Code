@@ -14,6 +14,8 @@ export interface FakeMovieStatusTable extends MovieStatusTable {
   failNext(error: DbError): void;
   /** A próxima escrita só termina quando o teste chamar resolve()/reject(). */
   deferNext(): Deferred;
+  /** A próxima selectAll captura as linhas agora e só devolve quando o teste chamar resolve(). */
+  deferNextSelect(): { resolve(): void };
   upsert: MovieStatusTable['upsert'] & { calls: unknown[][] };
 }
 
@@ -21,6 +23,7 @@ export interface FakeMovieStatusTable extends MovieStatusTable {
 export function createFakeMovieStatusTable(initial: MovieStatusRow[] = []): FakeMovieStatusTable {
   let failure: DbError | null = null;
   let deferred: Promise<DbResult> | null = null;
+  const selectGates: Promise<void>[] = [];
   const table = { rows: [...initial] } as FakeMovieStatusTable;
 
   const takeFailure = (): DbResult | null => {
@@ -57,7 +60,10 @@ export function createFakeMovieStatusTable(initial: MovieStatusRow[] = []): Fake
   table.selectAll = async () => {
     const failed = takeFailure();
     if (failed) return failed as DbResult<MovieStatusRow[] | null>;
-    return { data: [...table.rows], error: null };
+    const data = [...table.rows];
+    const gate = selectGates.shift();
+    if (gate) await gate;
+    return { data, error: null };
   };
   table.remove = async (movieId) => {
     const failed = takeFailure();
@@ -69,6 +75,11 @@ export function createFakeMovieStatusTable(initial: MovieStatusRow[] = []): Fake
   };
   table.failNext = (error) => {
     failure = error;
+  };
+  table.deferNextSelect = () => {
+    let open!: () => void;
+    selectGates.push(new Promise<void>((res) => (open = res)));
+    return { resolve: () => open() };
   };
   table.deferNext = () => {
     let settle!: (result: DbResult) => void;

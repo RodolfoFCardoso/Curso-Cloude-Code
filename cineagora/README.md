@@ -1,0 +1,45 @@
+# CineAgora
+
+Catálogo de filmes com o que está disponível nos streamings do Brasil. Dados da
+[TMDB](https://www.themoviedb.org/); disponibilidade via JustWatch.
+
+## 1. Conseguir a chave da TMDB (grátis)
+
+1. Crie uma conta em <https://www.themoviedb.org/signup> e confirme o e-mail.
+2. Logado, abra <https://www.themoviedb.org/settings/api> e solicite uma chave do tipo
+   **Developer**. Aceite os termos e preencha o formulário (uso pessoal/educacional; a URL
+   do app pode ser `http://localhost:3000`).
+3. Na mesma página, copie o **API Read Access Token** — o texto longo que começa com
+   `eyJ...` (não a "API Key" curta).
+4. Crie o arquivo `cineagora/.env.local` (ele fica fora do git) com:
+
+   ```
+   TMDB_API_KEY=eyJ...seu token...
+   ```
+
+Nunca commite nem compartilhe esse token.
+
+## 2. Rodar
+
+```bash
+cd cineagora
+npm install
+npm run dev
+```
+
+Abra <http://localhost:3000>.
+
+## Comandos
+
+| Comando          | O que faz                   |
+| ---------------- | --------------------------- |
+| `npm run dev`    | servidor de desenvolvimento |
+| `npm test`       | testes (Vitest)             |
+| `npm run lint`   | ESLint                      |
+| `npm run format` | Prettier                    |
+| `npm run build`  | build de produção           |
+
+> **OneDrive:** a pasta `node_modules` dentro do OneDrive pode deixar a sincronização
+> lenta. Se incomodar, pause a sincronização enquanto desenvolve.
+
+Este produto usa a API da TMDB, mas não é endossado nem certificado pela TMDB.

@@ -123,3 +123,11 @@ describe('logTmdbError', () => {
     spy.mockRestore();
   });
 });
+
+describe('codificação da busca', () => {
+  it('caracteres especiais vão codificados na URL', async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ results: [] }));
+    await tmdbFetch('/search/movie', { query: 'Amélie & #1' }, 60);
+    expect(fetchMock.mock.calls[0][0]).toContain('query=Am%C3%A9lie+%26+%231');
+  });
+});

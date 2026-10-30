@@ -1,26 +1,33 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuth, useMovieList } from '@/lib/auth/AuthProvider';
-import type { MovieStatus } from '@/lib/store/types';
+import type { MovieListError, MovieStatus } from '@/lib/store/types';
 import type { Movie } from '@/lib/tmdb/types';
 
-const OPTIONS: { status: MovieStatus; symbol: string; activeSymbol: string; label: string }[] = [
-  { status: 'want', symbol: '+', activeSymbol: '✓', label: 'Quero assistir' },
-  { status: 'watched', symbol: '✓', activeSymbol: '✓', label: 'Já assisti' },
+const OPTIONS: { status: MovieStatus; symbol: string; label: string }[] = [
+  { status: 'want', symbol: '+', label: 'Quero assistir' },
+  { status: 'watched', symbol: '✓', label: 'Já assisti' },
 ];
 
 export function MovieStatusButtons({ movie }: { movie: Movie }) {
   const { user, available } = useAuth();
-  const { ready, error, statusOf, setStatus } = useMovieList();
+  const { ready, error, statusOf, setStatus, reload } = useMovieList();
   const router = useRouter();
   const pathname = usePathname();
   const enterUrl = `/entrar?voltar=${encodeURIComponent(pathname)}`;
 
+  // O store sobrevive à navegação: ao voltar do login ele ainda guarda 'unauthenticated'.
+  // Já montado com esse erro, recarrega (limpa se a sessão voltou); só redireciona na transição.
+  const previous = useRef<MovieListError | null | undefined>(undefined);
   useEffect(() => {
-    if (error === 'unauthenticated') router.push(enterUrl);
-  }, [error, router, enterUrl]);
+    const before = previous.current;
+    previous.current = error;
+    if (error !== 'unauthenticated' || before === 'unauthenticated') return;
+    if (before === undefined) void reload();
+    else router.push(enterUrl);
+  }, [error, router, enterUrl, reload]);
 
   if (!available) return null;
 
@@ -53,7 +60,7 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
               }`}
             >
               <span aria-hidden="true" className="text-base leading-none">
-                {active ? o.activeSymbol : o.symbol}
+                {active ? '✓' : o.symbol}
               </span>
               {o.label}
             </button>

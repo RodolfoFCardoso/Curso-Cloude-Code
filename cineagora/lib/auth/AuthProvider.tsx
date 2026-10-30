@@ -6,16 +6,13 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
+  useState,
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { migrateLocalFavorites } from '../store/migrate-favorites';
-import {
-  createSupabaseMovieListStore,
-  movieStatusTable,
-} from '../store/supabase-movie-list';
+import { createSupabaseMovieListStore, movieStatusTable } from '../store/supabase-movie-list';
 import type { MovieListError, MovieListStore, MovieStatus } from '../store/types';
 import type { Movie } from '../tmdb/types';
 import type { AuthUser } from './types';
@@ -50,28 +47,31 @@ export function AuthProvider({
   const router = useRouter();
   const userId = user?.id ?? null;
 
-  // Um store (e uma tabela, para a migração) por usuário.
-  const created = useMemo(() => {
-    const current = user;
-    if (!current) return null;
-    if (makeStore) return { store: makeStore(current), table: null };
-    const table = movieStatusTable(getSupabaseBrowserClient(), current.id);
-    return { store: createSupabaseMovieListStore(table), table };
+  // O store nasce só no cliente (efeito): o construtor do adapter já dispara a carga, e no
+  // servidor isso seria uma consulta anônima. Antes de montar, o estado coincide com o snapshot do servidor.
+  const [created, setCreated] = useState<{ userId: string; store: MovieListStore } | null>(null);
+  /* eslint-disable react-hooks/set-state-in-effect -- o store precisa nascer no cliente, após a montagem */
+  useEffect(() => {
+    if (!user) return; // sem usuário, `store` derivado abaixo já é null
+    // Ao trocar de usuário, escritas/cargas em andamento do store antigo terminam contra a tabela
+    // dele (presa ao id antigo): inofensivo, não precisa de dispose.
+    if (makeStore) {
+      setCreated({ userId: user.id, store: makeStore(user) });
+      return;
+    }
+    const table = movieStatusTable(getSupabaseBrowserClient(), user.id);
+    const store = createSupabaseMovieListStore(table);
+    setCreated({ userId: user.id, store });
+    const storage = browserStorage();
+    if (storage) {
+      migrateLocalFavorites(storage, table)
+        .then((n) => (n > 0 ? store.reload() : undefined))
+        .catch(() => {});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- recria só quando o id muda
   }, [userId]);
-  const store = created?.store ?? null;
-
-  const migratedFor = useRef<unknown>(null);
-  useEffect(() => {
-    if (!created?.table || migratedFor.current === created) return;
-    migratedFor.current = created;
-    const { store: s, table } = created;
-    const storage = browserStorage();
-    if (!storage) return;
-    migrateLocalFavorites(storage, table)
-      .then((n) => (n > 0 ? s.reload() : undefined))
-      .catch(() => {});
-  }, [created]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+  const store = created && created.userId === userId ? created.store : null;
 
   useEffect(() => {
     if (!available) return;
@@ -129,12 +129,15 @@ export function useMovieList(): {
     store ? () => store.list('watched') : emptySnapshot,
     emptySnapshot,
   );
-  return {
-    ready,
-    error,
-    list: (status) => (status === 'want' ? want : watched),
-    statusOf: (id) => store?.statusOf(id) ?? null,
-    setStatus: (movie, status) => store?.setStatus(movie, status),
-    reload: () => store?.reload() ?? Promise.resolve(),
-  };
+  return useMemo(
+    () => ({
+      ready,
+      error,
+      list: (status: MovieStatus) => (status === 'want' ? want : watched),
+      statusOf: (id: number) => store?.statusOf(id) ?? null,
+      setStatus: (movie: Movie, status: MovieStatus | null) => store?.setStatus(movie, status),
+      reload: () => store?.reload() ?? Promise.resolve(),
+    }),
+    [store, ready, error, want, watched],
+  );
 }

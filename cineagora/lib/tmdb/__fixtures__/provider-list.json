@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "provider_id": 337,
+      "provider_name": "Disney Plus",
+      "logo_path": "/disney.jpg",
+      "display_priority": 1,
+      "display_priorities": { "BR": 5, "US": 1 }
+    },
+    {
+      "provider_id": 9999,
+      "provider_name": "Serviço Sem BR",
+      "logo_path": null,
+      "display_priority": 3,
+      "display_priorities": { "US": 2 }
+    },
+    {
+      "provider_id": 8,
+      "provider_name": "Netflix",
+      "logo_path": "/netflix.jpg",
+      "display_priority": 9,
+      "display_priorities": { "BR": 0, "US": 3 }
+    }
+  ]
+}

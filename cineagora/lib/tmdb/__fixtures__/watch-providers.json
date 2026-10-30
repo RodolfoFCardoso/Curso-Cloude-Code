@@ -1,0 +1,77 @@
+{
+  "id": 550,
+  "results": {
+    "BR": {
+      "link": "https://www.themoviedb.org/movie/550-fight-club/watch?locale=BR",
+      "flatrate": [
+        {
+          "logo_path": "/netflix.jpg",
+          "provider_id": 8,
+          "provider_name": "Netflix",
+          "display_priority": 2
+        },
+        {
+          "logo_path": "/max.jpg",
+          "provider_id": 1899,
+          "provider_name": "Max",
+          "display_priority": 1
+        }
+      ],
+      "free": [
+        {
+          "logo_path": "/pluto.jpg",
+          "provider_id": 300,
+          "provider_name": "Pluto TV",
+          "display_priority": 5
+        }
+      ],
+      "ads": [
+        {
+          "logo_path": "/pluto.jpg",
+          "provider_id": 300,
+          "provider_name": "Pluto TV",
+          "display_priority": 5
+        },
+        {
+          "logo_path": "/tubi.jpg",
+          "provider_id": 73,
+          "provider_name": "Tubi",
+          "display_priority": 9
+        }
+      ],
+      "rent": [
+        {
+          "logo_path": "/apple.jpg",
+          "provider_id": 2,
+          "provider_name": "Apple TV",
+          "display_priority": 4
+        }
+      ],
+      "buy": [
+        {
+          "logo_path": "/google.jpg",
+          "provider_id": 3,
+          "provider_name": "Google Play Filmes",
+          "display_priority": 6
+        },
+        {
+          "logo_path": "/apple.jpg",
+          "provider_id": 2,
+          "provider_name": "Apple TV",
+          "display_priority": 4
+        }
+      ]
+    },
+    "US": {
+      "link": "https://www.themoviedb.org/movie/550-fight-club/watch?locale=US",
+      "flatrate": [
+        {
+          "logo_path": "/hulu.jpg",
+          "provider_id": 15,
+          "provider_name": "Hulu",
+          "display_priority": 1
+        }
+      ]
+    }
+  }
+}

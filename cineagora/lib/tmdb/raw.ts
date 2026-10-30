@@ -40,3 +40,24 @@ export type RawMovieDetails = RawMovie & {
   credits?: { cast?: RawCastMember[] };
   similar?: RawMovieList;
 };
+
+export type RawProvider = {
+  provider_id: number;
+  provider_name?: string;
+  logo_path?: string | null;
+  display_priority?: number;
+  display_priorities?: Record<string, number>;
+};
+
+export type RawRegionProviders = {
+  link?: string | null;
+  flatrate?: RawProvider[];
+  free?: RawProvider[];
+  ads?: RawProvider[];
+  rent?: RawProvider[];
+  buy?: RawProvider[];
+};
+
+export type RawWatchProviders = { id?: number; results?: Record<string, RawRegionProviders> };
+
+export type RawProviderList = { results?: RawProvider[] };

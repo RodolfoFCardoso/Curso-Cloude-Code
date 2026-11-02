@@ -1,6 +1,6 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { authErrorMessage } from '@/lib/auth/messages';
 import { RECOVERY_COOKIE } from '@/lib/auth/recovery';
@@ -76,7 +76,14 @@ export async function requestPasswordReset(
   if (!email) return fail('Informe seu e-mail.', email);
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  // Com o modelo de e-mail padrão o link volta com ?code=; /auth/confirm troca o code pela sessão.
+  const origin = (await headers()).get('origin');
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    email,
+    origin
+      ? { redirectTo: `${origin}/auth/confirm?type=recovery&next=/conta/nova-senha` }
+      : undefined,
+  );
   // Resposta neutra para não revelar quais e-mails têm conta; só o limite de envio aparece.
   if (error?.code && RATE_LIMIT_CODES.has(error.code)) {
     return fail(authErrorMessage(error), email);

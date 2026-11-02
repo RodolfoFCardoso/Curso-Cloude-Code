@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const h = vi.hoisted(() => ({ verifyOtp: vi.fn(), set: vi.fn() }));
+const h = vi.hoisted(() => ({ verifyOtp: vi.fn(), exchangeCodeForSession: vi.fn(), set: vi.fn() }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({ auth: { verifyOtp: h.verifyOtp } }),
+  createSupabaseServerClient: async () => ({ auth: { verifyOtp: h.verifyOtp, exchangeCodeForSession: h.exchangeCodeForSession } }),
 }));
 vi.mock('next/headers', () => ({ cookies: async () => ({ set: h.set }) }));
 vi.mock('next/navigation', () => ({
@@ -61,7 +61,23 @@ describe('GET /auth/confirm', () => {
     );
     expect(h.verifyOtp).not.toHaveBeenCalled();
   });
-  it('sem token_hash é falha', async () => {
+  it('recovery com code (modelo padrão do Supabase) troca o code e grava cookie', async () => {
+    h.exchangeCodeForSession.mockResolvedValue({ error: null });
+    await expect(GET(req('code=xyz&type=recovery&next=/conta/nova-senha'))).rejects.toThrow(
+      'REDIRECT:/conta/nova-senha',
+    );
+    expect(h.exchangeCodeForSession).toHaveBeenCalledWith('xyz');
+    expect(h.verifyOtp).not.toHaveBeenCalled();
+    expect(h.set).toHaveBeenCalledWith('cineagora_recovery', '1', expect.anything());
+  });
+  it('code inválido em recovery vai para recuperar com erro', async () => {
+    h.exchangeCodeForSession.mockResolvedValue({ error: { code: 'bad_code_verifier' } });
+    await expect(GET(req('code=xyz&type=recovery'))).rejects.toThrow(
+      'REDIRECT:/entrar/recuperar?erro=link-expirado',
+    );
+    expect(h.set).not.toHaveBeenCalled();
+  });
+  it('sem token_hash nem code é falha', async () => {
     await expect(GET(req('type=signup'))).rejects.toThrow('REDIRECT:/entrar?erro=link-expirado');
     expect(h.verifyOtp).not.toHaveBeenCalled();
   });

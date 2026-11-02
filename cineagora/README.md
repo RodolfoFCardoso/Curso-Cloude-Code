@@ -44,8 +44,11 @@ Contas e listas ("Quero assistir" / "Já assisti") usam o [Supabase](https://sup
 3. No painel, abra o **SQL Editor** e rode o conteúdo de `supabase/schema.sql` (cria a tabela
    `movie_status` com RLS ativada).
 4. Em **Authentication > URL Configuration**, defina a **Site URL** (em dev, `http://localhost:3000`)
-   e inclua a mesma origem em **Redirect URLs**.
-5. Em **Authentication > Email Templates**, troque o link dos dois modelos:
+   e inclua `http://localhost:3000/**` em **Redirect URLs**.
+5. (Opcional — o plano gratuito só libera com SMTP próprio.) Com os modelos de e-mail padrão, o
+   link de recuperação de senha volta com `?code=` e só funciona no mesmo navegador que pediu o
+   e-mail. Para links que abrem em qualquer navegador, em **Authentication > Email Templates**
+   troque o link dos dois modelos:
    - **Confirm signup**:
 
      ```

@@ -6,8 +6,12 @@ const h = vi.hoisted(() => ({
   signOut: vi.fn(),
   resetPasswordForEmail: vi.fn(),
   deleteCookie: vi.fn(),
+  origin: 'http://localhost:3000' as string | null,
 }));
-vi.mock('next/headers', () => ({ cookies: async () => ({ delete: h.deleteCookie }) }));
+vi.mock('next/headers', () => ({
+  cookies: async () => ({ delete: h.deleteCookie }),
+  headers: async () => new Headers(h.origin ? { origin: h.origin } : {}),
+}));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
@@ -168,6 +172,20 @@ describe('requestPasswordReset', () => {
       email: '',
     });
     expect(h.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+  it('link do e-mail volta para /auth/confirm na origem do pedido', async () => {
+    h.resetPasswordForEmail.mockResolvedValue({ error: null });
+    await requestPasswordReset(idle, form({ email: 'x@y.z' }));
+    expect(h.resetPasswordForEmail).toHaveBeenCalledWith('x@y.z', {
+      redirectTo: 'http://localhost:3000/auth/confirm?type=recovery&next=/conta/nova-senha',
+    });
+  });
+  it('sem origin deixa o Supabase usar a Site URL', async () => {
+    h.origin = null;
+    h.resetPasswordForEmail.mockResolvedValue({ error: null });
+    await requestPasswordReset(idle, form({ email: 'x@y.z' }));
+    expect(h.resetPasswordForEmail).toHaveBeenCalledWith('x@y.z', undefined);
+    h.origin = 'http://localhost:3000';
   });
   it('rate limit vira erro', async () => {
     h.resetPasswordForEmail.mockResolvedValue({ error: { code: 'over_email_send_rate_limit' } });

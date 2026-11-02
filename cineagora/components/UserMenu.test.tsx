@@ -73,6 +73,7 @@ describe('UserMenu', () => {
     await user.click(btn);
     expect(btn).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('rodolfo@x.com')).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Meu perfil' })).toHaveAttribute('href', '/perfil');
     expect(screen.getByRole('menuitem', { name: 'Trocar senha' })).toHaveAttribute(
       'href',
       '/conta/senha',

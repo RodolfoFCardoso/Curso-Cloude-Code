@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { Billboard } from '@/components/Billboard';
 import { MovieStatusButtons } from '@/components/MovieStatusButtons';
 import { Row } from '@/components/Row';
-import { Screen } from '@/components/Screen';
 import { WhereToWatch } from '@/components/WhereToWatch';
 import { formatRating, formatRuntime } from '@/lib/format';
 import { parseMovieId } from '@/lib/rails';
@@ -58,41 +58,46 @@ export default async function MoviePage({ params }: Props) {
   const runtime = formatRuntime(movie.runtimeMinutes);
   const facts = [movie.year, runtime, movie.genres.map((g) => g.name).join(', ')].filter(Boolean);
 
+  const heading = (
+    <div className="max-w-3xl">
+      <h1 className="font-display text-[clamp(3rem,7vw,6.5rem)] leading-[0.86] font-black tracking-[-0.01em] text-balance text-tela uppercase drop-shadow-[0_6px_24px_rgba(0,0,0,0.8)]">
+        {movie.title}
+      </h1>
+      <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-tela/90 tabular-nums">
+        {rating && <span className="font-semibold text-folha">★ {rating}</span>}
+        {facts.map((f) => (
+          <span key={String(f)}>{f}</span>
+        ))}
+      </p>
+      <div className="mt-6">
+        <MovieStatusButtons
+          movie={{
+            id: movie.id,
+            title: movie.title,
+            year: movie.year,
+            rating: movie.rating,
+            posterUrl: movie.posterUrl,
+            backdropUrl: movie.backdropUrl,
+            genreIds: movie.genreIds,
+          }}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <article>
-      <header className="px-4 pt-20 sm:px-10 sm:pt-24">
-        {movie.backdropUrl ? <Screen src={movie.backdropUrl} priority /> : <div className="h-16" />}
-        <div className="relative px-1 sm:px-6">
-          <h1
-            className={`font-display text-[clamp(3rem,7.5vw,7.25rem)] leading-[0.84] font-black tracking-[-0.01em] text-balance text-tela uppercase drop-shadow-[0_6px_24px_rgba(10,4,7,0.8)] ${
-              movie.backdropUrl ? '-mt-[0.34em]' : ''
-            }`}
-          >
-            {movie.title}
-          </h1>
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-x-10 gap-y-5">
-            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-tela/85 tabular-nums">
-              {rating && <span className="font-semibold text-projetor">★ {rating}</span>}
-              {facts.map((f) => (
-                <span key={String(f)}>{f}</span>
-              ))}
-            </p>
-            <MovieStatusButtons
-              movie={{
-                id: movie.id,
-                title: movie.title,
-                year: movie.year,
-                rating: movie.rating,
-                posterUrl: movie.posterUrl,
-                backdropUrl: movie.backdropUrl,
-                genreIds: movie.genreIds,
-              }}
-            />
-          </div>
-        </div>
+      <header>
+        {movie.backdropUrl ? (
+          <Billboard src={movie.backdropUrl} imageClassName="projetor-acende" priority>
+            {heading}
+          </Billboard>
+        ) : (
+          <div className="px-4 pt-32 sm:px-10">{heading}</div>
+        )}
       </header>
 
-      <div className="mt-14 grid grid-cols-1 gap-12 px-4 sm:px-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-16">
+      <div className="mt-10 grid grid-cols-1 gap-12 px-4 sm:px-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-16">
         <div className="flex min-w-0 flex-col gap-14">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
             <div className="relative aspect-[2/3] w-36 shrink-0 overflow-hidden rounded-md bg-poltrona shadow-[0_20px_50px_-15px_rgba(0,0,0,0.9)] ring-1 ring-tela/10 sm:w-48">

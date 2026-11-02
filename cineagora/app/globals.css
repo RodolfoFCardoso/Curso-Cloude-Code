@@ -1,17 +1,23 @@
 @import 'tailwindcss';
 
-/* Sala escura: veludo das poltronas, luz do projetor, a tela. */
+/*
+ * Sala escura em verde: o preto da sala, o veludo verde-musgo das poltronas e da cortina,
+ * e uma luz de projetor esverdeada. O verde escuro é a cor da marca (preenchimentos com
+ * texto branco); a folha, clara, é só para detalhes pequenos legíveis no preto.
+ */
 @theme inline {
   --font-sans: var(--font-hanken), system-ui, sans-serif;
   --font-display: var(--font-shoulders), 'Arial Narrow', sans-serif;
 
-  --color-veludo: #170b10;
-  --color-poltrona: #24131a;
-  --color-cortina: #3d1f2a;
-  --color-projetor: #ffc857;
-  --color-projetor-forte: #ffd884;
-  --color-tela: #f6efe7;
-  --color-penumbra: #b29ea5;
+  --color-veludo: #010604;
+  --color-poltrona: #0a1a13;
+  --color-cortina: #163626;
+  --color-mata: #0b3d27;
+  --color-projetor: #1e7a4f;
+  --color-projetor-forte: #186642;
+  --color-folha: #7ed4a4;
+  --color-tela: #eef3ef;
+  --color-penumbra: #93a99d;
 }
 
 html {
@@ -25,11 +31,11 @@ body {
 
 ::selection {
   background: var(--color-projetor);
-  color: var(--color-veludo);
+  color: var(--color-tela);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-projetor);
+  outline: 2px solid var(--color-folha);
   outline-offset: 3px;
 }
 
@@ -44,6 +50,13 @@ body {
 }
 .trilho::-webkit-scrollbar {
   display: none;
+}
+
+/* Numeral do ranking: só o contorno, em verde, como letreiro de néon apagado. */
+.numeral-ranking {
+  color: var(--color-veludo);
+  -webkit-text-stroke: 3px var(--color-projetor);
+  paint-order: stroke fill;
 }
 
 /* O único momento orquestrado: o projetor acende sobre o filme em destaque. */

@@ -56,7 +56,7 @@ export function useRailRetry(): () => void {
 const noop = () => {};
 
 const buttonClass =
-  'rounded-full bg-projetor px-5 py-2.5 text-sm font-semibold text-veludo transition-colors hover:bg-projetor-forte';
+  'rounded-md bg-projetor px-5 py-2.5 text-sm font-semibold text-tela transition-colors hover:bg-projetor-forte';
 
 const secondaryButtonClass =
   'rounded-full px-5 py-2.5 text-sm text-tela ring-1 ring-cortina transition-colors hover:bg-cortina';

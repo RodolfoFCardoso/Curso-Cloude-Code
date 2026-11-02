@@ -13,7 +13,7 @@ const tabClass = (active: boolean) =>
   }`;
 
 const inputClass =
-  'w-full rounded-full bg-veludo/50 px-4 py-3 text-sm text-tela ring-1 ring-tela/15 outline-none placeholder:text-penumbra transition focus:bg-poltrona focus:ring-projetor';
+  'w-full rounded-full bg-veludo/50 px-4 py-3 text-sm text-tela ring-1 ring-tela/15 outline-none placeholder:text-penumbra transition focus:bg-poltrona focus:ring-folha';
 
 export function AuthForm({ voltar, erro }: { voltar: string; erro?: string }) {
   const [mode, setMode] = useState<'entrar' | 'criar'>('entrar');
@@ -47,7 +47,11 @@ export function AuthForm({ voltar, erro }: { voltar: string; erro?: string }) {
         </button>
       </div>
 
-      <form key={mode} action={creating ? signUpAction : signInAction} className="flex flex-col gap-3">
+      <form
+        key={mode}
+        action={creating ? signUpAction : signInAction}
+        className="flex flex-col gap-3"
+      >
         <input type="hidden" name="voltar" value={voltar} />
         <label className="flex flex-col gap-1 text-sm text-tela">
           E-mail
@@ -74,7 +78,7 @@ export function AuthForm({ voltar, erro }: { voltar: string; erro?: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="mt-1 inline-flex items-center justify-center rounded-full bg-projetor px-5 py-3 text-sm font-semibold text-veludo transition-colors hover:bg-projetor/85 disabled:opacity-60"
+          className="mt-1 inline-flex items-center justify-center rounded-md bg-projetor px-5 py-3 text-sm font-semibold text-tela transition-colors hover:bg-projetor-forte disabled:opacity-60"
         >
           {creating ? 'Criar conta' : 'Entrar'}
         </button>

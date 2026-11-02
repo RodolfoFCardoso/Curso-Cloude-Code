@@ -18,7 +18,7 @@ export default function HomeError({
           <button
             type="button"
             onClick={() => retry()}
-            className="rounded-full bg-projetor px-5 py-2.5 text-sm font-semibold text-veludo transition-colors hover:bg-projetor-forte"
+            className="rounded-md bg-projetor px-5 py-2.5 text-sm font-semibold text-tela transition-colors hover:bg-projetor-forte"
           >
             Tentar novamente
           </button>

@@ -63,7 +63,7 @@ export function UserMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-cortina text-sm font-semibold text-tela ring-1 ring-tela/15 transition-colors hover:bg-poltrona"
+        className="font-display flex h-10 w-10 items-center justify-center rounded-md bg-projetor text-xl leading-none font-black text-tela transition-colors hover:bg-projetor-forte"
       >
         {initial}
       </button>
@@ -71,9 +71,17 @@ export function UserMenu() {
         <div
           role="menu"
           aria-label="Conta"
-          className="absolute right-0 z-50 mt-2 flex w-64 max-w-[calc(100vw-2rem)] flex-col gap-1 rounded-xl bg-poltrona p-2 shadow-[0_12px_40px_rgba(0,0,0,0.5)] ring-1 ring-cortina"
+          className="absolute right-0 z-50 mt-2 flex w-64 max-w-[calc(100vw-2rem)] flex-col gap-1 rounded-md bg-poltrona p-2 shadow-[0_12px_40px_rgba(0,0,0,0.5)] ring-1 ring-cortina"
         >
           <p className="truncate px-3 py-2 text-sm text-penumbra">{user.email}</p>
+          <Link
+            href="/perfil"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="rounded-lg px-3 py-2 text-sm text-tela hover:bg-cortina"
+          >
+            Meu perfil
+          </Link>
           <Link
             href="/conta/senha"
             role="menuitem"

@@ -8,7 +8,7 @@ export default function MovieNotFound() {
         title="Filme não encontrado"
         message="Talvez o link esteja errado ou o filme tenha saído da base da TMDB."
         action={
-          <Link href="/" className="text-projetor underline-offset-4 hover:underline">
+          <Link href="/" className="text-folha underline-offset-4 hover:underline">
             Voltar para o início
           </Link>
         }

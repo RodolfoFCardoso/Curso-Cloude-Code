@@ -48,7 +48,7 @@ export function WhereToWatch({ providers }: { providers: WatchProviders }) {
           href={providers.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-block text-sm font-semibold text-projetor underline-offset-4 hover:underline"
+          className="mt-6 inline-block text-sm font-semibold text-folha underline-offset-4 hover:underline"
         >
           Ver preços e opções no JustWatch ↗
         </a>

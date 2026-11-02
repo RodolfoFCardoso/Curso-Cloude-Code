@@ -56,20 +56,20 @@ async function setup(status: MovieStatus, store?: MovieListStore, u: typeof user
 afterEach(cleanup);
 
 describe('MovieListPanel', () => {
-  it('deslogado convida para entrar com voltar da aba', async () => {
+  it('deslogado convida para entrar com voltar da lista', async () => {
     await setup('want', undefined, null);
     expect(screen.getByText('Entre para montar suas listas')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute(
       'href',
-      '/entrar?voltar=%2F%3Faba%3Dquero-assistir',
+      '/entrar?voltar=%2Fperfil%3Flista%3Dquero-assistir',
     );
   });
 
-  it('voltar usa a aba Já assisti', async () => {
+  it('voltar usa a lista Já assisti', async () => {
     await setup('watched', undefined, null);
     expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute(
       'href',
-      '/entrar?voltar=%2F%3Faba%3Dja-assisti',
+      '/entrar?voltar=%2Fperfil%3Flista%3Dja-assisti',
     );
   });
 
@@ -78,7 +78,7 @@ describe('MovieListPanel', () => {
     expect(screen.getByText('Entre para montar suas listas')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute(
       'href',
-      '/entrar?voltar=%2F%3Faba%3Dquero-assistir',
+      '/entrar?voltar=%2Fperfil%3Flista%3Dquero-assistir',
     );
   });
 
@@ -102,10 +102,7 @@ describe('MovieListPanel', () => {
   });
 
   it('lista os filmes do status, mais recente primeiro', async () => {
-    await setup(
-      'want',
-      stub({ ready: true, lists: { want: [mk(2), mk(1)], watched: [mk(3)] } }),
-    );
+    await setup('want', stub({ ready: true, lists: { want: [mk(2), mk(1)], watched: [mk(3)] } }));
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'));
     expect(hrefs).toEqual(['/filme/2', '/filme/1']);
   });

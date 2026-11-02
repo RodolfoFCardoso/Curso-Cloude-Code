@@ -2,17 +2,13 @@
 
 import Link from 'next/link';
 import { useAuth, useMovieList } from '@/lib/auth/AuthProvider';
-import type { HomeTab } from '@/lib/home-tabs';
+import { LIST_LABEL, listHref, STATUS_LIST } from '@/lib/profile-lists';
 import type { MovieStatus } from '@/lib/store/types';
 import { EmptyState } from './EmptyState';
 import { MovieCard } from './MovieCard';
 
-const STATUS_TAB: Record<MovieStatus, HomeTab> = {
-  want: 'quero-assistir',
-  watched: 'ja-assisti',
-};
-
-const GRID = 'grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6';
+const GRID =
+  'grid grid-cols-1 gap-x-2.5 gap-y-5 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
 
 export function MovieListPanel({ status }: { status: MovieStatus }) {
   const { user } = useAuth();
@@ -20,7 +16,7 @@ export function MovieListPanel({ status }: { status: MovieStatus }) {
 
   // Sessão expirada (ou Sair em outra aba): mesmo convite do deslogado.
   if (!user || error === 'unauthenticated') {
-    const voltar = encodeURIComponent(`/?aba=${STATUS_TAB[status]}`);
+    const voltar = encodeURIComponent(listHref(STATUS_LIST[status]));
     return (
       <EmptyState
         title="Entre para montar suas listas"
@@ -28,7 +24,7 @@ export function MovieListPanel({ status }: { status: MovieStatus }) {
         action={
           <Link
             href={`/entrar?voltar=${voltar}`}
-            className="inline-block rounded-full bg-projetor px-5 py-2 text-sm font-semibold text-veludo"
+            className="inline-block rounded-md bg-projetor px-5 py-2 text-sm font-semibold text-tela"
           >
             Entrar
           </Link>
@@ -45,7 +41,7 @@ export function MovieListPanel({ status }: { status: MovieStatus }) {
           <button
             type="button"
             onClick={() => void reload()}
-            className="rounded-full bg-projetor px-5 py-2 text-sm font-semibold text-veludo"
+            className="rounded-md bg-projetor px-5 py-2 text-sm font-semibold text-tela"
           >
             Tentar de novo
           </button>
@@ -61,7 +57,7 @@ export function MovieListPanel({ status }: { status: MovieStatus }) {
           <div
             key={i}
             data-testid="list-skeleton"
-            className="aspect-[2/3] animate-pulse rounded-md bg-poltrona motion-reduce:animate-none"
+            className="aspect-video animate-pulse rounded-[4px] bg-poltrona motion-reduce:animate-none"
           />
         ))}
       </div>
@@ -71,7 +67,10 @@ export function MovieListPanel({ status }: { status: MovieStatus }) {
   const movies = list(status);
   if (movies.length === 0) {
     return (
-      <EmptyState title="Nada aqui ainda." message="Abra um filme e marque Quero assistir." />
+      <EmptyState
+        title="Nada aqui ainda."
+        message={`Abra um filme e marque ${LIST_LABEL[STATUS_LIST[status]]}.`}
+      />
     );
   }
 

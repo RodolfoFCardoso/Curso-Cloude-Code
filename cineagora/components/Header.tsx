@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import type { WatchProvider } from '@/lib/tmdb/types';
+import { HeaderNav } from './HeaderNav';
 import { HeaderShell } from './HeaderShell';
 import { Logo } from './Logo';
 import { ProviderFilter } from './ProviderFilter';
@@ -10,10 +11,16 @@ import { UserMenu } from './UserMenu';
 export function Header({ providers }: { providers: WatchProvider[] | null }) {
   return (
     <HeaderShell>
-      <div className="flex items-center gap-2.5 px-4 py-3 sm:gap-6 sm:px-10 sm:py-4">
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-3 px-4 py-3 sm:gap-x-6 sm:px-10 sm:py-4">
         <Link href="/" aria-label="CineAgora, início" className="shrink-0 rounded-md">
-          <Logo />
+          <Logo compact />
         </Link>
+        {/* Em telas menores a navegação desce para uma segunda linha. */}
+        <nav aria-label="Principal" className="order-last w-full lg:order-none lg:w-auto">
+          <Suspense fallback={null}>
+            <HeaderNav />
+          </Suspense>
+        </nav>
         <div className="hidden flex-1 justify-end sm:flex">
           <SearchBar />
         </div>

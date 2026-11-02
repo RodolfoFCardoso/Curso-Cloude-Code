@@ -74,10 +74,10 @@ export function MovieStatusButtons({ movie }: { movie: Movie }) {
               aria-pressed={active}
               disabled={(!!user && !ready) || loadFailed}
               onClick={() => onClick(o.status)}
-              className={`inline-flex items-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold ring-1 backdrop-blur-md transition-colors disabled:opacity-60 ${
+              className={`inline-flex items-center gap-2 self-start rounded-md px-5 py-3 text-sm font-bold ring-1 backdrop-blur-md transition-colors disabled:opacity-60 ${
                 active
-                  ? 'bg-tela text-veludo ring-tela hover:bg-tela/85'
-                  : 'bg-tela/10 text-tela ring-tela/30 hover:bg-tela/20'
+                  ? 'bg-projetor text-tela ring-folha/60 hover:bg-projetor-forte'
+                  : 'bg-tela/15 text-tela ring-tela/20 hover:bg-tela/25'
               }`}
             >
               <span aria-hidden="true" className="text-base leading-none">

@@ -40,7 +40,7 @@ export default async function SearchPage({ searchParams }: PageProps<'/busca'>) 
       ) : movies.length === 0 ? (
         <EmptyState title={`Nenhum filme encontrado para "${q}". Tente outro termo.`} />
       ) : (
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
+        <ul className="grid grid-cols-1 gap-x-2.5 gap-y-5 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {movies.map((m) => (
             <li key={m.id}>
               <MovieCard movie={m} fluid />

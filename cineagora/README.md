@@ -97,11 +97,12 @@ Checklist para validar o fluxo completo no navegador (`npm run dev`):
       ```
 
       Ou no console da página: `localStorage.setItem('cineagora:favorites:v1', JSON.stringify({ movies: [{ id: 550, title: 'Clube da Luta' }] }))`.
+
 - [ ] Cadastrar uma conta nova e confirmar pelo e-mail.
 - [ ] Resultado esperado: após o primeiro login, "Clube da Luta" aparece em "Quero assistir" e a
       chave `cineagora:favorites:v1` some do Local Storage.
 - [ ] Marcar 2 filmes, um em cada status ("Quero assistir" e "Já assisti").
-- [ ] Conferir as contagens nas abas da home.
+- [ ] Conferir as contagens em "Meu perfil" (/perfil) e o trilho "Quero assistir" na home.
 - [ ] Logout em uma aba reflete na outra aberta.
 - [ ] Trocar a senha pela página da conta.
 - [ ] Recuperar a senha pelo e-mail e definir uma nova.

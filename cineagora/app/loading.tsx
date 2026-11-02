@@ -3,20 +3,17 @@ import { RailSkeleton } from '@/components/RailSkeleton';
 export default function Loading() {
   return (
     <div>
-      <div aria-hidden="true" className="px-4 pt-20 sm:px-10 sm:pt-24">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <div>
-            <div className="aspect-video animate-pulse rounded-[3px] bg-poltrona lg:aspect-[2.39/1]" />
-            <div className="mt-6 h-20 w-3/5 animate-pulse rounded bg-poltrona sm:ml-6" />
-          </div>
-          <div className="hidden flex-col gap-3 lg:flex">
-            {Array.from({ length: 5 }, (_, i) => (
-              <div key={i} className="h-[76px] animate-pulse rounded bg-poltrona" />
-            ))}
-          </div>
+      <div
+        aria-hidden="true"
+        className="flex min-h-[560px] items-end bg-gradient-to-t from-poltrona to-veludo px-4 pb-16 sm:min-h-[620px] sm:px-10 lg:h-[min(56.25vw,88vh)] lg:pb-[13vw]"
+      >
+        <div className="w-full max-w-2xl">
+          <div className="h-24 w-4/5 animate-pulse rounded bg-cortina/60" />
+          <div className="mt-5 h-4 w-1/2 animate-pulse rounded bg-cortina/60" />
+          <div className="mt-6 h-12 w-40 animate-pulse rounded-md bg-cortina/60" />
         </div>
       </div>
-      <div className="mt-14">
+      <div className="relative lg:-mt-[9vw]">
         {Array.from({ length: 3 }, (_, i) => (
           <RailSkeleton key={i} />
         ))}

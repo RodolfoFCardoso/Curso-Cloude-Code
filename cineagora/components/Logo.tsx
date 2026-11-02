@@ -18,7 +18,14 @@ export function LogoMark({ className = '' }: { className?: string }) {
   );
 }
 
-export function Logo({ size = 'md' }: { size?: 'md' | 'sm' }) {
+export function Logo({
+  size = 'md',
+  compact = false,
+}: {
+  size?: 'md' | 'sm';
+  /** Em telas estreitas mostra só o ingresso. */
+  compact?: boolean;
+}) {
   const md = size === 'md';
   return (
     <span className="inline-flex items-center gap-2 sm:gap-2.5">
@@ -26,7 +33,7 @@ export function Logo({ size = 'md' }: { size?: 'md' | 'sm' }) {
       <span
         className={`font-display leading-none font-black tracking-[0.02em] text-tela uppercase ${
           md ? 'text-[1.45rem] sm:text-[1.85rem]' : 'text-xl'
-        }`}
+        } ${compact ? 'hidden min-[420px]:inline' : ''}`}
       >
         CineAgora
       </span>

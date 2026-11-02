@@ -78,15 +78,20 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
     setSelected([...next]);
   }
 
+  const label = chosen.size > 0 ? `Meus streamings (${chosen.size})` : 'Meus streamings';
+
   return (
     <>
       <button
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
-        className="flex shrink-0 items-center gap-2 rounded-full bg-projetor px-3.5 py-2 text-sm sm:px-4 font-semibold text-veludo transition-colors hover:bg-projetor-forte"
+        aria-label={label}
+        className="flex shrink-0 items-center gap-2 rounded-md bg-projetor px-3 py-2 text-sm font-semibold text-tela transition-colors hover:bg-projetor-forte sm:px-4"
       >
-        {chosen.size > 0 ? `Meus streamings (${chosen.size})` : 'Meus streamings'}
+        {/* No celular o "Meus" sai para o cabeçalho caber numa linha. */}
+        <span className="hidden min-[480px]:inline">Meus&nbsp;</span>
+        {chosen.size > 0 ? `streamings (${chosen.size})` : 'streamings'}
       </button>
 
       {open && (
@@ -129,7 +134,7 @@ export function ProviderFilter({ providers }: { providers: WatchProvider[] | nul
                   placeholder="Buscar serviço…"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="rounded-lg bg-veludo px-3 py-2.5 text-sm text-tela ring-1 ring-cortina outline-none placeholder:text-penumbra focus:ring-projetor focus-visible:outline-none"
+                  className="rounded-lg bg-veludo px-3 py-2.5 text-sm text-tela ring-1 ring-cortina outline-none placeholder:text-penumbra focus:ring-folha focus-visible:outline-none"
                 />
                 <ul className="-mx-2 flex-1 overflow-y-auto">
                   {visible.map((p) => (
